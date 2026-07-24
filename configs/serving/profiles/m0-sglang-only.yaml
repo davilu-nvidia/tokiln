@@ -1,0 +1,9 @@
+# M0: 单节点纯 SGLang, 兼容性 Gate 与降级形态。
+profile:
+  name: m0-sglang-only
+  runtime: sglang-direct
+  frontend: {port: 8000, mode: openai}
+  workers:
+    - {node: node1, gpus: "0-7", parallel: {tp: 8}, mem_fraction: 0.90}
+  kv: {l1: radix}
+  limits: {max_concurrency: 128, timeout_s: 600}

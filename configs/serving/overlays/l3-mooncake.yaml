@@ -1,0 +1,8 @@
+# M2 第二步方案 A。与 l3-flexkv.yaml 互斥 (render 校验)。
+kv:
+  l3:
+    backend: mooncake
+    endpoints: [node1:50051, node2:50051]
+    transport: rdma
+    rdma_devices: [mlx5_0]
+    capacity_gb_per_node: 1000   # NVMe 预算, 按实测调

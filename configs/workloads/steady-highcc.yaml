@@ -1,0 +1,4 @@
+# 验收门槛 workload: 30 分钟稳态。
+workload: {name: steady-highcc, tool: aa-loadgen, mode: synth}
+params: {concurrency: 64, duration_s: 1800, seed: 42}
+pass_criteria: {err_rate_max: 0.005, no_worker_restart: true, no_oom: true}

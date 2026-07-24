@@ -1,0 +1,5 @@
+# Dynamo + 自建 SGLang adapter (spike 02: 官方 pin sglang 0.5.11, 与 GLM-5.2 冲突)。
+ARG DYNAMO_VERSION=1.2.1
+FROM nvcr.io/nvidia/ai-dynamo/dynamo:${DYNAMO_VERSION}
+# TODO(spike 02): 覆盖安装 sglang 0.5.13.post1 adapter 并跑 contract test 后 pin。
+LABEL org.tokiln.component=dynamo

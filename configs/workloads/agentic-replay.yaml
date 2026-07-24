@@ -1,0 +1,8 @@
+# 正式 A/B 结论以 replay 为准 (真实轨迹, ignore_eos 钉死 OSL)。
+workload: {name: agentic-replay, tool: aa-loadgen, mode: replay}
+params:
+  trace: third_party/aa-loadgen/replay/examples/astropy-12907.dsv4flash.dag.jsonl  # TODO: 换 full300 长 trace
+  concurrency: 32
+  agent_context: true
+ab: {arms: [A, B], vary: router.kind, values: [thunderagent, kv-aware]}
+note: "DSV4 trace 在 GLM-5.2 上是负载测试; GLM 行为学结论需 M2 前用 GLM 重录 trace。"

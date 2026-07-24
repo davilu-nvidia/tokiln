@@ -1,0 +1,20 @@
+# 声明式节点清单 —— preflight / render / deploy 的输入。
+cluster:
+  name: tokiln-dev
+nodes:
+  - name: node1
+    host: 10.0.0.1            # TODO: 实际 IP
+    ssh: {user: root, port: 22}
+    roles: [control, worker]
+    gpus: {sku: H20-141GB, count: 8, hbm_gb: 141}
+    dram_gb: 2048              # TODO: 实测
+    nvme:  {path: /raid, free_gb_min: 2000}
+    rdma:  {devices: [mlx5_0], link: roce}   # TODO: 实测 ib/roce 与设备名
+  - name: node2
+    host: 10.0.0.2
+    ssh: {user: root, port: 22}
+    roles: [worker]
+    gpus: {sku: H20-141GB, count: 8, hbm_gb: 141}
+    dram_gb: 2048
+    nvme:  {path: /raid, free_gb_min: 2000}
+    rdma:  {devices: [mlx5_0], link: roce}

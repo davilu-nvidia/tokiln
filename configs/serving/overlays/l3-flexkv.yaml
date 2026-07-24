@@ -1,0 +1,7 @@
+# M2 第二步方案 B。与 l3-mooncake.yaml 互斥。
+kv:
+  l3:
+    backend: flexkv
+    tiers: [host, nvme]
+    nvme_path: /raid/flexkv
+    capacity_gb_per_node: 1000

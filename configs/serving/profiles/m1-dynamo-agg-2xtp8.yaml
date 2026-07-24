@@ -1,0 +1,14 @@
+# M1 默认拓扑: Dynamo frontend + 2×TP8 aggregated (141GB 版 H20 已确认可行)。
+profile:
+  name: m1-dynamo-agg-2xtp8
+  runtime: dynamo
+  frontend: {port: 8000, mode: openai, node: node1}
+  router:
+    kind: thunderagent            # A/B: 换 kv-aware / round-robin 只改这一行
+    session_header: x-dynamo-session-id
+  infra: {nats: node1, etcd: node1}
+  workers:
+    - {node: node1, gpus: "0-7", parallel: {tp: 8}, mem_fraction: 0.85}
+    - {node: node2, gpus: "0-7", parallel: {tp: 8}, mem_fraction: 0.85}
+  kv: {l1: radix}
+  limits: {max_concurrency: 256, queue_size: 128, timeout_s: 600}

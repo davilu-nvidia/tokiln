@@ -1,0 +1,15 @@
+# M0: 单节点纯 SGLang ({{ worker.node }})
+services:
+  sglang:
+    image: "{{ versions.components.sglang.image or 'tokiln/sglang-glm52:dev' }}"
+    command: >-
+      python3 -m sglang.launch_server {{ sglang_args }}
+      --host 0.0.0.0 --port {{ frontend.port }}
+    network_mode: host
+    ipc: host
+    shm_size: 64g
+    deploy:
+      resources: {reservations: {devices: [{driver: nvidia, device_ids: ["{{ worker.gpus }}"], capabilities: [gpu]}]}}
+    volumes:
+      - {{ model.weights_cache }}:{{ model.weights_cache }}
+    restart: "no"     # M0 故障要暴露, 不自动拉起

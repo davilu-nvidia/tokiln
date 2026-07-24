@@ -1,0 +1,7 @@
+# M2 第一步: 仅 host DRAM offload。
+kv:
+  l2:
+    enabled: true
+    host_mem_gb: 512            # 按 inventory.dram_gb 留余量; render 校验
+    write_policy: write_through
+    page_size: 64

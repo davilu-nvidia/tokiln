@@ -1,0 +1,17 @@
+# M1 infra (跑在 {{ profile.infra.nats }}): NATS + etcd + Prometheus + Grafana
+services:
+  nats:
+    image: "{{ versions.components.nats.image }}"
+    command: ["-js"]
+    network_mode: host
+  etcd:
+    image: "{{ versions.components.etcd.image }}"
+    command: ["etcd", "--advertise-client-urls=http://0.0.0.0:2379", "--listen-client-urls=http://0.0.0.0:2379"]
+    network_mode: host
+  prometheus:
+    image: "{{ versions.components.prometheus.image }}"
+    network_mode: host
+    volumes: ["../../monitor/prometheus:/etc/prometheus:ro"]
+  grafana:
+    image: "{{ versions.components.grafana.image }}"
+    network_mode: host

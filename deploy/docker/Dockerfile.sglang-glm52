@@ -1,0 +1,5 @@
+# SGLang >= 0.5.13.post1 (GLM-5.2 最低要求)。ta-repro 考古后把基础镜像与 pip 版本全部 pin 死。
+ARG SGLANG_VERSION=0.5.13.post1
+FROM lmsysorg/sglang:v${SGLANG_VERSION}-cu124
+# 禁止就地 pip 升级 —— 一切改动走本 Dockerfile 重建并更新 VERSIONS.lock 的 digest。
+LABEL org.tokiln.component=sglang-glm52

@@ -1,0 +1,23 @@
+# M1 worker 节点: {{ worker.node }} (frontend 仅在 {{ profile.frontend.node }} 上启用)
+services:
+{% if worker.node == profile.frontend.node %}
+  dynamo-frontend:
+    image: "{{ versions.components.dynamo.image or 'tokiln/dynamo:dev' }}"
+    # TODO(spike 02): frontend + {{ profile.router.kind }} router 启动命令, 对齐实际 dynamo CLI
+    command: ["sleep", "infinity"]
+    network_mode: host
+{% endif %}
+  sglang-worker:
+    image: "{{ versions.components.sglang.image or 'tokiln/sglang-glm52:dev' }}"
+    command: >-
+      python3 -m sglang.launch_server {{ sglang_args }}
+    network_mode: host
+    ipc: host
+    shm_size: 64g
+    environment:
+      - NATS_URL=nats://{{ profile.infra.nats }}:4222
+      - ETCD_URL=http://{{ profile.infra.etcd }}:2379
+    deploy:
+      resources: {reservations: {devices: [{driver: nvidia, device_ids: ["{{ worker.gpus }}"], capabilities: [gpu]}]}}
+    volumes:
+      - {{ model.weights_cache }}:{{ model.weights_cache }}

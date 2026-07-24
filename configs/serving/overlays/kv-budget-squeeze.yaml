@@ -1,0 +1,3 @@
+# 实验专用: 压缩 GPU KV 预算以放大 L2/L3 增益可观测性
+# (141GB HBM 下 L1 过大会掩盖分层收益, 见设计文档附录 A.1)。
+workers_patch: {mem_fraction: 0.55}

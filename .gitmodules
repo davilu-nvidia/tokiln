@@ -1,0 +1,3 @@
+[submodule "third_party/aa-loadgen"]
+	path = third_party/aa-loadgen
+	url = https://github.com/davilu-nvidia/aa-loadgen.git
