@@ -3,11 +3,13 @@ A/B 两 arm 并排 + 差值; 支持跨多个 run_dir 收集 arm (bench 每个 ar
 后续接 bench_serving/aiperf 的解析器。"""
 import json, pathlib
 
-KEYS = ["ttft_p95", "out_speed_p25", "out_speed_p50", "tpot_p50",
-        "e2e_p50", "steps_per_min", "req_ok", "req_err", "total_out_tokens"]
+# 与 aaload/core.py build_report 的输出字段严格对齐 (契约)
+KEYS = ["ttft_p50_s", "ttft_p95_s", "tpot_p50_ms", "tpot_p95_ms",
+        "e2e_p50_s", "steps_per_min", "throughput_tok_s",
+        "out_speed_median_tok_s", "requests_ok", "requests_err", "total_out_tokens"]
 
 # 差值中 "越低越好" 的指标, 用于标注方向
-LOWER_BETTER = {"ttft_p95", "tpot_p50", "e2e_p50", "req_err"}
+LOWER_BETTER = {"ttft_p50_s", "ttft_p95_s", "tpot_p50_ms", "tpot_p95_ms", "e2e_p50_s", "requests_err"}
 
 
 def load_arm(path: pathlib.Path) -> dict:
