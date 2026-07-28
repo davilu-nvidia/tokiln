@@ -1,0 +1,5 @@
+# M0 single-node scrape config (the cluster-level template lives in monitor/prometheus/).
+global: {scrape_interval: 5s}
+scrape_configs:
+  - job_name: sglang
+    static_configs: [{targets: ["localhost:8000"]}]

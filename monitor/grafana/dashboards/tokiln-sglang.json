@@ -1,0 +1,327 @@
+{
+ "uid": "tokiln-sglang",
+ "title": "Tokiln \u2014 SGLang serving (M0)",
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "5s",
+ "time": {
+  "from": "now-1h",
+  "to": "now"
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "timeseries",
+   "title": "Generation throughput (tok/s)",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 0,
+    "y": 0
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "max(sglang:gen_throughput)",
+     "legendFormat": "gen tok/s",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "timeseries",
+   "title": "Requests",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 0
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "max(sglang:num_running_reqs)",
+     "legendFormat": "running",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    },
+    {
+     "expr": "max(sglang:num_queue_reqs)",
+     "legendFormat": "queued",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "timeseries",
+   "title": "KV token usage",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 0,
+    "y": 8
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     },
+     "max": 1,
+     "min": 0
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "max(sglang:token_usage)",
+     "legendFormat": "token usage",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "timeseries",
+   "title": "Prefix cache hit rate (5m)",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 8
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     },
+     "max": 1,
+     "min": 0
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum(rate(sglang:cached_tokens_total[5m])) / sum(rate(sglang:prompt_tokens_total[5m]))",
+     "legendFormat": "cache hit",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "type": "timeseries",
+   "title": "TTFT p95 / p50 (5m)",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 0,
+    "y": 16
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.95, sum(rate(sglang:time_to_first_token_seconds_bucket[5m])) by (le))",
+     "legendFormat": "p95",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    },
+    {
+     "expr": "histogram_quantile(0.50, sum(rate(sglang:time_to_first_token_seconds_bucket[5m])) by (le))",
+     "legendFormat": "p50",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "type": "timeseries",
+   "title": "Inter-token latency p95 / p50 (5m)",
+   "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 16
+   },
+   "datasource": {
+    "type": "prometheus",
+    "uid": "tokiln-prom"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 8,
+      "showPoints": "never",
+      "spanNulls": true
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.95, sum(rate(sglang:inter_token_latency_seconds_bucket[5m])) by (le))",
+     "legendFormat": "p95",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    },
+    {
+     "expr": "histogram_quantile(0.50, sum(rate(sglang:inter_token_latency_seconds_bucket[5m])) by (le))",
+     "legendFormat": "p50",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "tokiln-prom"
+     }
+    }
+   ]
+  }
+ ]
+}

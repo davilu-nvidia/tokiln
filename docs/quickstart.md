@@ -41,7 +41,16 @@ tokiln monitor watch --monitor-url http://10.6.131.9:8100
 python watch.py --url http://10.6.131.9:8100
 ```
 
-Browser version: open `http://10.6.131.9:8100/`.
+Browser GUI: open `http://10.6.131.9:8100/` — live KPI tiles, throughput/requests/utilization
+time-series charts, per-GPU bars, and a **load-client panel that can start/stop a bench in either
+of the two primary modes: synthetic (AA-AgentPerf) or real-trajectory SWE-bench replay**.
+
+Persistent layer (Prometheus :9091 + Grafana :3000, provisioned dashboard included):
+
+```bash
+docker compose -f monitor/grafana/compose.yaml up -d
+# open http://10.6.131.9:3000/d/tokiln-sglang  (anonymous viewer enabled)
+```
 
 Apply load (120s smoke, 8-concurrency agentic synthetic workload):
 

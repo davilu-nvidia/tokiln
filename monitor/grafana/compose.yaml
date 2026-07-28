@@ -1,0 +1,24 @@
+# Persistent monitoring layer for M0 single-node: Prometheus (:9091) + Grafana (:3000).
+# Usage: docker compose -f monitor/grafana/compose.yaml up -d   (run from the repo root)
+# Prometheus listens on 9091 because 9090 is commonly taken by legacy collectors.
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    network_mode: host
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.listen-address=:9091
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.1.0
+    network_mode: host
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/tokiln-sglang.json
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+    restart: unless-stopped
