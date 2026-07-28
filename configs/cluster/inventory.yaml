@@ -3,18 +3,10 @@ cluster:
   name: tokiln-dev
 nodes:
   - name: node1
-    host: 10.0.0.1            # TODO: 实际 IP
+    host: 10.6.131.9           # H20-GPU-09
     ssh: {user: root, port: 22}
     roles: [control, worker]
-    gpus: {sku: H20-141GB, count: 8, hbm_gb: 141}
-    dram_gb: 2048              # TODO: 实测
+    gpus: {sku: H20-3e-141GB, count: 8, hbm_gb: 141}
+    dram_gb: 2015              # free -g 实测
     nvme:  {path: /raid, free_gb_min: 2000}
-    rdma:  {devices: [mlx5_0], link: roce}   # TODO: 实测 ib/roce 与设备名
-  - name: node2
-    host: 10.0.0.2
-    ssh: {user: root, port: 22}
-    roles: [worker]
-    gpus: {sku: H20-141GB, count: 8, hbm_gb: 141}
-    dram_gb: 2048
-    nvme:  {path: /raid, free_gb_min: 2000}
-    rdma:  {devices: [mlx5_0], link: roce}
+    rdma:  {devices: [mlx5_0, mlx5_1, mlx5_2], link: roce}   # ibv_devinfo: PORT_ACTIVE

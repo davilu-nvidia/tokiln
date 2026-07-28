@@ -4,7 +4,7 @@
 components:
   sglang:
     version: "0.5.13.post1"        # GLM-5.2 最低要求; ta-repro 考古后确认
-    image: ""                       # UNPINNED: deploy/docker/build.sh 构建后写入 digest
+    image: "lmsysorg/sglang:nightly-dev-cu12-20260716-b0b2dfbd"   # sha256:030aa98e5bc1..., GlmMoeDsaForCausalLM 支持已验证
   dynamo:
     version: "1.2.1"                # 注意: 官方 pin sglang 0.5.11, 需自建 adapter (spike 02)
     image: ""                       # UNPINNED
