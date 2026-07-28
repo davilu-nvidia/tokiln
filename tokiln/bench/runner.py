@@ -29,6 +29,10 @@ def build_cmd(workload_name: str, url: str, model: str, arm: str,
 
 
 def run(workload_name: str, url: str, model: str, arm: str, run_dir: pathlib.Path) -> dict:
+    if not LOADGEN.exists():
+        return {"rc": 3, "error": f"aa-loadgen 未就绪: {LOADGEN} 不存在。"
+                                  "请先执行: git submodule update --init (私有仓库需先配置访问权限)",
+                "cmd": "", "wall_s": 0.0, "log": ""}
     run_dir.mkdir(parents=True, exist_ok=True)
     cmd = build_cmd(workload_name, url, model, arm, run_dir)
     log = run_dir / f"loadgen_arm{arm}.log"

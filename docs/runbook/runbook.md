@@ -9,7 +9,7 @@
 ## 压测
 - smoke: `tokiln bench --workload smoke --arm A`
 - A/B:  两次 bench 仅换 profile 的 router.kind (或 run_exp 风格切模型名), 其余参数不动
-- 汇总: `tokiln report runs/<run_id>`
+- 汇总: 单 arm `tokiln report runs/<run_id>`; A/B 传两个目录 `tokiln report runs/<armA_run> runs/<armB_run>` (自动出并排表 + 差值列)
 
 ## 看瓶颈
 - 快看板: third_party/aa-loadgen/monitor (5s 粒度)

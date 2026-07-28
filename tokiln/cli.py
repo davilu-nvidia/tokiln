@@ -75,7 +75,7 @@ def cmd_bench(args):
 
 
 def cmd_report(args):
-    print(aggregate_mod.compare(pathlib.Path(args.run_dir)))
+    print(aggregate_mod.compare([pathlib.Path(d) for d in args.run_dir]))
 
 
 def main():
@@ -106,7 +106,9 @@ def main():
     p.add_argument("--model", default="glm52")
     p.set_defaults(func=cmd_bench)
 
-    p = sub.add_parser("report"); p.add_argument("run_dir"); p.set_defaults(func=cmd_report)
+    p = sub.add_parser("report"); p.add_argument("run_dir", nargs="+",
+        help="一个或多个 run_dir; A/B 时传两个 (bench 每个 arm 各占一个 run_dir)")
+    p.set_defaults(func=cmd_report)
 
     args = ap.parse_args()
     args.func(args)

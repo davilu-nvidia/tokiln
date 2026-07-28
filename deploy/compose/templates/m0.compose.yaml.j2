@@ -9,7 +9,7 @@ services:
     ipc: host
     shm_size: 64g
     deploy:
-      resources: {reservations: {devices: [{driver: nvidia, device_ids: ["{{ worker.gpus }}"], capabilities: [gpu]}]}}
+      resources: {reservations: {devices: [{driver: nvidia, device_ids: [{% for g in gpu_ids %}"{{ g }}"{% if not loop.last %}, {% endif %}{% endfor %}], capabilities: [gpu]}]}}
     volumes:
       - {{ model.weights_cache }}:{{ model.weights_cache }}
     restart: "no"     # M0 故障要暴露, 不自动拉起
