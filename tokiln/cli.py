@@ -74,6 +74,19 @@ def cmd_bench(args):
     sys.exit(res["rc"])
 
 
+def cmd_monitor(args):
+    if args.mode == "serve":
+        from .monitor.server import serve
+        serve(args.sglang, RUNS, port=args.port, interval=args.interval or 5.0)
+    else:  # watch
+        from .monitor import watch
+        import sys
+        sys.argv = ["watch", "--url", args.monitor_url, "--interval", str(args.interval or 2.0)]
+        if args.once:
+            sys.argv.append("--once")
+        watch.main()
+
+
 def cmd_report(args):
     print(aggregate_mod.compare([pathlib.Path(d) for d in args.run_dir]))
 
@@ -105,6 +118,15 @@ def main():
     p.add_argument("--url", default="http://localhost:8000/v1")
     p.add_argument("--model", default="glm52")
     p.set_defaults(func=cmd_bench)
+
+    p = sub.add_parser("monitor", help="server/client 实时监控: serve 在服务节点跑, watch 在任意终端跑")
+    p.add_argument("mode", choices=["serve", "watch"])
+    p.add_argument("--sglang", default="http://localhost:8000", help="serve: sglang 地址")
+    p.add_argument("--port", type=int, default=8100, help="serve: 监听端口")
+    p.add_argument("--monitor-url", default="http://localhost:8100", help="watch: monitor serve 地址")
+    p.add_argument("--interval", type=float, default=0, help="采集/刷新间隔 (0=默认: serve 5s, watch 2s)")
+    p.add_argument("--once", action="store_true", help="watch: 只渲染一帧")
+    p.set_defaults(func=cmd_monitor)
 
     p = sub.add_parser("report"); p.add_argument("run_dir", nargs="+",
         help="一个或多个 run_dir; A/B 时传两个 (bench 每个 arm 各占一个 run_dir)")
