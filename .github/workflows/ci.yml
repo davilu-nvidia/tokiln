@@ -13,7 +13,7 @@ jobs:
       - run: pip install -e . pytest
       - run: python -m compileall -q tokiln
       - run: pytest -q tests
-      # 渲染产物必须能过 docker compose config (runner 自带 docker)
+      # rendered artifacts must pass docker compose config (runner ships with docker)
       - run: |
           python -m tokiln.cli render --profile m0-sglang-only
           docker compose -f runs/*/node1.compose.yaml config -q
