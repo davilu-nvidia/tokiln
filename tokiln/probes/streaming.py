@@ -24,7 +24,8 @@ async def run(url: str, model: str):
                 chunk = json.loads(payload)
                 if chunk.get("usage"):
                     usage = chunk["usage"]
-                if chunk.get("choices") and chunk["choices"][0].get("delta", {}).get("content"):
+                delta = (chunk.get("choices") or [{}])[0].get("delta") or {}
+                if delta.get("content") or delta.get("reasoning_content"):
                     ts.append(time.time())
     ok = len(ts) >= 2 and ts == sorted(ts) and usage is not None
     return ok, {"chunks": len(ts), "usage": usage,

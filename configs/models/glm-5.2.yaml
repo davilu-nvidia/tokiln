@@ -8,5 +8,5 @@ model:
   served_model_name: glm52      # 与 ta-repro 现状对齐: glm52 / glm52ta 由 router 决定
   chat_template: glm-5.2
   reasoning_parser: glm45       # spike 01 验证实际 parser 名
-  tool_call_parser: glm45
+  tool_call_parser: glm47      # 模板 auto-detect 为 glm47; glm45 已废弃, 解析不了 <arg_key>/<arg_value> 格式
   weights_cache: /raid/model_hub
