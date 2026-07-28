@@ -4,6 +4,9 @@
 栈: NVIDIA Dynamo + SGLang + ThunderAgent router + HiCache (L2 host offload, L3 mooncake/flexkv 可切)。
 
 - 设计文档: [docs/design/tokiln-code-structure.md](docs/design/tokiln-code-structure.md)
+- 架构图: [docs/design/tokiln-architecture.svg](docs/design/tokiln-architecture.svg)
+
+![Tokiln 代码架构](docs/design/tokiln-architecture.svg)
 - 压测器: [third_party/aa-loadgen](https://github.com/davilu-nvidia/aa-loadgen) (submodule; synth + 真实轨迹 replay)
 - 里程碑: M0 单节点纯 SGLang → M1 Dynamo+TA 双节点 A/B → M2 HiCache L2→L3 → M3 K8s 化
 
