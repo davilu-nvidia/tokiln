@@ -1,5 +1,5 @@
-"""profile ⊕ overlays → resolved config (+ digest)。
-digest 进 run manifest, 保证 "同一 digest = 同一部署形态"。"""
+"""profile ⊕ overlays → resolved config (+ digest).
+The digest goes into the run manifest, guaranteeing "same digest = same deployment shape"."""
 import copy, hashlib, json, pathlib
 import yaml
 
@@ -31,7 +31,7 @@ def config_digest(resolved: dict) -> str:
 
 def load_resolved(profile: str, overlays: list[str] | None = None,
                   model: str = "glm-5.2") -> dict:
-    """返回 {'inventory','model','profile','digest'} 已通过 schema 校验的 resolved config。"""
+    """Return a schema-validated resolved config: {'inventory','model','profile','digest'}."""
     overlays = overlays or []
     inv = _load(CFG / "cluster" / "inventory.yaml")
     mdl = _load(CFG / "models" / f"{model}.yaml")["model"]
@@ -47,19 +47,19 @@ def load_resolved(profile: str, overlays: list[str] | None = None,
         if wp:
             prof["workers"] = [{**w, **wp} for w in prof["workers"]]
     if l3_seen > 1:
-        raise ValueError("l3-mooncake 与 l3-flexkv 互斥, 只能叠加一个")
+        raise ValueError("l3-mooncake and l3-flexkv are mutually exclusive; stack at most one")
 
     inventory = Inventory(**inv)
     model_spec = ModelSpec(**mdl)
     profile_spec = ServingProfile(**prof)
 
-    # 交叉校验: L2 host_mem 不得超过节点 DRAM 的 70%
+    # Cross-check: L2 host_mem must not exceed 70% of node DRAM
     if profile_spec.kv.l2 and profile_spec.kv.l2.get("enabled"):
         need = profile_spec.kv.l2.get("host_mem_gb", 0)
         for w in profile_spec.workers:
             dram = inventory.node(w.node).dram_gb
             if dram and need > dram * 0.7:
-                raise ValueError(f"{w.node}: hicache host_mem_gb={need} 超过 DRAM({dram}GB) 的 70%")
+                raise ValueError(f"{w.node}: hicache host_mem_gb={need} exceeds 70% of DRAM ({dram}GB)")
 
     resolved = {
         "inventory": inventory.model_dump(),

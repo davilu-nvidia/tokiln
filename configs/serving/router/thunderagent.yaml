@@ -1,7 +1,7 @@
 router:
   kind: thunderagent
   session_header: x-dynamo-session-id
-  # 以下参数名以 dynamo thunderagent_router 实际 flag 为准 (spike 02 填):
+  # Parameter names below follow the actual dynamo thunderagent_router flags (filled in spike 02):
   buffer_per_program_tokens: 8192
   pause_watermark: 0.92
   resume_watermark: 0.80

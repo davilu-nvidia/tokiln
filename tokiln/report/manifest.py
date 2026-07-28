@@ -1,4 +1,4 @@
-"""RunManifest: 一次运行的完整可复现坐标。"""
+"""RunManifest: the complete reproducibility coordinates of one run."""
 import json, pathlib, subprocess, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]

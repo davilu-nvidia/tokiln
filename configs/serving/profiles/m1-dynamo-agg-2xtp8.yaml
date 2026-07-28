@@ -1,10 +1,10 @@
-# M1 默认拓扑: Dynamo frontend + 2×TP8 aggregated (141GB 版 H20 已确认可行)。
+# M1 default topology: Dynamo frontend + 2×TP8 aggregated (confirmed feasible on the 141GB H20).
 profile:
   name: m1-dynamo-agg-2xtp8
   runtime: dynamo
   frontend: {port: 8000, mode: openai, node: node1}
   router:
-    kind: thunderagent            # A/B: 换 kv-aware / round-robin 只改这一行
+    kind: thunderagent            # A/B: switching to kv-aware / round-robin changes only this line
     session_header: x-dynamo-session-id
   infra: {nats: node1, etcd: node1}
   workers:

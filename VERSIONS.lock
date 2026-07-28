@@ -1,12 +1,12 @@
-# Tokiln 全局版本锁 —— 单一事实来源。
-# 所有条目在 M0 "ta-repro 考古" 后填入实测值并锁 digest;
-# UNPINNED 状态下 tokiln deploy 会打印警告。
+# Tokiln global version lock — the single source of truth.
+# All entries get measured values and pinned digests after the M0 "ta-repro archaeology";
+# tokiln deploy prints a warning while anything is UNPINNED.
 components:
   sglang:
-    version: "0.5.13.post1"        # GLM-5.2 最低要求; ta-repro 考古后确认
-    image: "lmsysorg/sglang:nightly-dev-cu12-20260716-b0b2dfbd"   # sha256:030aa98e5bc1..., GlmMoeDsaForCausalLM 支持已验证
+    version: "0.5.13.post1"        # GLM-5.2 minimum; confirm after ta-repro archaeology
+    image: "lmsysorg/sglang:nightly-dev-cu12-20260716-b0b2dfbd"   # sha256:030aa98e5bc1..., GlmMoeDsaForCausalLM support verified
   dynamo:
-    version: "1.2.1"                # 注意: 官方 pin sglang 0.5.11, 需自建 adapter (spike 02)
+    version: "1.2.1"                # note: upstream pins sglang 0.5.11; needs a custom adapter (spike 02)
     image: ""                       # UNPINNED
   mooncake:
     version: ""                     # spike 04
@@ -18,6 +18,6 @@ components:
   grafana: {image: "grafana/grafana:11.1.0"}
 model:
   glm-5.2:
-    revision: ""                    # UNPINNED: HF commit / 内部镜像 tag
+    revision: ""                    # UNPINNED: HF commit / internal mirror tag
 submodules:
-  aa-loadgen: ""                    # git submodule pin 即事实, 此处冗余记录便于 manifest
+  aa-loadgen: ""                    # the git submodule pin is the fact; recorded here redundantly for manifests

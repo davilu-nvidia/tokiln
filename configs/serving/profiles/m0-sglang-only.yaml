@@ -1,4 +1,4 @@
-# M0: 单节点纯 SGLang, 兼容性 Gate 与降级形态。
+# M0: single-node pure SGLang; the compatibility gate and the fallback shape.
 profile:
   name: m0-sglang-only
   runtime: sglang-direct

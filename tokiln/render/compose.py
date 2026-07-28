@@ -1,5 +1,5 @@
-"""resolved config → 每节点 docker compose 文件 (M0–M2 运行时后端)。
-M3 的 render/dgd.py 与本模块同接口: render(resolved, out_dir) -> list[Path]。"""
+"""resolved config → per-node docker compose files (M0–M2 runtime backend).
+M3's render/dgd.py shares this module's interface: render(resolved, out_dir) -> list[Path]."""
 import pathlib
 import yaml
 from jinja2 import Environment, FileSystemLoader
@@ -9,7 +9,7 @@ TPL = ROOT / "deploy" / "compose" / "templates"
 
 
 def _gpu_ids(spec: str) -> list[str]:
-    """'0-7' / '0,2,4' / '3' → 显式 ID 列表。docker compose 的 device_ids 不支持范围语法。"""
+    """'0-7' / '0,2,4' / '3' → explicit ID list. docker compose device_ids has no range syntax."""
     ids: list[str] = []
     for part in str(spec).split(","):
         part = part.strip()
@@ -22,7 +22,8 @@ def _gpu_ids(spec: str) -> list[str]:
 
 
 def _sglang_args(model: dict, worker: dict, kv: dict, extra: dict) -> list[str]:
-    """由 resolved config 生成 sglang 启动参数。UNPINNED 项在此集中, 便于 ta-repro 考古后统一替换。"""
+    """Build sglang launch args from the resolved config. UNPINNED items are centralized here
+    so they can be replaced in one place after the ta-repro archaeology."""
     a = [
         f"--model-path {model['weights_cache']}/{model.get('local_dir') or model['name']}",
         f"--served-model-name {model['served_model_name']}",
@@ -38,11 +39,11 @@ def _sglang_args(model: dict, worker: dict, kv: dict, extra: dict) -> list[str]:
     l2 = kv.get("l2") or {}
     if l2.get("enabled"):
         a += ["--enable-hierarchical-cache",
-              f"--hicache-ratio {round(l2['host_mem_gb'] / 100, 2)}",  # TODO(spike 03): 换实测换算
+              f"--hicache-ratio {round(l2['host_mem_gb'] / 100, 2)}",  # TODO(spike 03): replace with measured conversion
               f"--hicache-write-policy {l2.get('write_policy', 'write_through')}"]
     l3 = kv.get("l3") or {}
     if l3:
-        a.append(f"--hicache-storage-backend {l3['backend']}")  # TODO(spike 04): backend 具体 flag
+        a.append(f"--hicache-storage-backend {l3['backend']}")  # TODO(spike 04): exact backend flag
     return a
 
 

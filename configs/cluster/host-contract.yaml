@@ -1,4 +1,4 @@
-# Host Contract: preflight 的通过标准 (只读检查, 不改机器)。
+# Host contract: the pass bar for preflight (read-only checks; never modifies machines).
 os: {distro: ubuntu, version: "22.04", arch: x86_64}
 kernel_min: "5.15"
 nvidia: {driver_min: "550.54", cuda_min: "12.4"}
@@ -7,4 +7,4 @@ network:
   ports_free: [8000, 8100, 4222, 2379, 9090, 3000]
   inter_node: {rdma_required_for: [l3-mooncake, tp16], bw_min_gbps: 100}
 storage:
-  model_cache_min_gb: 1500      # GLM-5.2 权重 + 余量, M0 实测后收紧
+  model_cache_min_gb: 1500      # GLM-5.2 weights + headroom; tighten after M0 measurements

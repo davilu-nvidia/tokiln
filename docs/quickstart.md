@@ -1,75 +1,75 @@
-# Tokiln Quickstart (M0: 单节点 SGLang)
+# Tokiln Quickstart (M0: single-node SGLang)
 
-从零到"服务起来、发压、实时监控"的最短路径。以 h20-09 (8×H20-3e) + GLM-5.2-FP8 为例。
+Shortest path from zero to "service up, load applied, live monitoring". Example: h20-09 (8×H20-3e) + GLM-5.2-FP8.
 
-## 0. 前置条件
+## 0. Prerequisites
 
-- 权重在 `configs/models/<model>.yaml` 的 `weights_cache/local_dir` 指向的目录 (例: `/raid/model_hub/GLM-5.2-FP8`)
-- `VERSIONS.lock` 里 pin 的 sglang 镜像已 `docker pull`
-- 控制机可免密 ssh 到 inventory 里所有 `enabled` 节点 (**包括自己**: `cat ~/.ssh/id_*.pub >> ~/.ssh/authorized_keys`)
-- 端口 8000 (frontend) / 8100 (monitor) 空闲
+- Weights present at the directory `configs/models/<model>.yaml` points to via `weights_cache/local_dir` (e.g. `/raid/model_hub/GLM-5.2-FP8`)
+- The sglang image pinned in `VERSIONS.lock` already pulled (`docker pull`)
+- The control node can ssh password-free to every `enabled` node in the inventory (**including itself**: `cat ~/.ssh/id_*.pub >> ~/.ssh/authorized_keys`)
+- Ports 8000 (frontend) and 8100 (monitor) free
 
-## 1. 安装 → 体检 → 渲染 → 起服务
+## 1. Install → preflight → render → launch
 
 ```bash
-make install          # pip install -e . + submodule (pip >= 23 才支持 PEP660 editable)
-make preflight        # ssh 只读体检所有 enabled 节点, go=True 才继续
-make m0-render        # 渲染 docker compose 产物到 runs/<ts>-m0-sglang-only-<id>/
+make install          # pip install -e . + submodules (PEP 660 editable needs pip >= 23)
+make preflight        # read-only ssh checks on all enabled nodes; continue only on go=True
+make m0-render        # renders docker compose artifacts into runs/<ts>-m0-sglang-only-<id>/
 docker compose -f runs/<run_dir>/node1.compose.yaml up -d
-docker logs -f <container>   # 等 "The server is fired up and ready to roll" (首次 DeepGEMM warmup ~5min)
+docker logs -f <container>   # wait for "The server is fired up and ready to roll" (first DeepGEMM warmup ~5min)
 ```
 
-## 2. 验收探针 (Go/No-Go)
+## 2. Acceptance probes (Go/No-Go)
 
 ```bash
-make probe            # stack / streaming / parser / hicache / cancel 五连, 全 PASS 输出 GO
+make probe            # stack / streaming / parser / hicache / cancel; all PASS prints GO
 ```
 
-## 3. 发压 + 实时监控
+## 3. Load + live monitoring
 
-服务节点起监控端 (采集 sglang /metrics + nvidia-smi + loadgen progress):
+Start the monitor on the serving node (scrapes sglang /metrics + nvidia-smi + loadgen progress):
 
 ```bash
-make monitor-serve    # :8100, 也可 nohup 后台跑
+make monitor-serve    # :8100, can run under nohup
 ```
 
-任意机器的终端看板 (**Windows / macOS / Linux 通用**, 仅 Python 标准库):
+Terminal dashboard from any machine (**Windows / macOS / Linux**, Python stdlib only):
 
 ```bash
 tokiln monitor watch --monitor-url http://10.6.131.9:8100
-# 没装 tokiln 的机器: 拷走 tokiln/monitor/watch.py 单文件即可
+# machines without tokiln installed: just copy the single file tokiln/monitor/watch.py
 python watch.py --url http://10.6.131.9:8100
 ```
 
-浏览器版: 直接开 `http://10.6.131.9:8100/`。
+Browser version: open `http://10.6.131.9:8100/`.
 
-发压 (120s smoke, 8 并发 agentic 合成负载):
+Apply load (120s smoke, 8-concurrency agentic synthetic workload):
 
 ```bash
-make smoke            # 结束打印 pass_criteria 判定; 未达标 rc=4
-python -m tokiln.cli report runs/<run_dir>   # 生成 report.md
+make smoke            # prints the pass_criteria verdict at the end; unmet criteria → rc=4
+python -m tokiln.cli report runs/<run_dir>   # produces report.md
 ```
 
-监控看板效果:
+Dashboard during load:
 
 ```
 ┌─ tokiln monitor ── H20-GPU-09 ── 18:46:59 ── server UP ✓ ── model glm52
 │ running    8   queued    0   gen    422.2 tok/s   aborted 3
 │ KV usage [████████████░░░░░░░░░░░░]  52.0%   cache hit  71.6%   TTFT 1.621s   ITL 35.3ms
-│ GPU util% [100 100 100 100 100 100 100 100]  mem 139G/卡  power 2839W
+│ GPU util% [100 100 100 100 100 100 100 100]  mem 139G/gpu  power 2839W
 │ tput  ▄▂▇▆▄▄▇▅▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁█▇▄▅▇▅▆█▇▁▇▆▇▃▃▅█▇▆▆█
 │ client [20260728-184509-smoke-armA-1150dc] 2 done, ok=78 err=0 ...
 └──────────────────────────────────────────────────────────────
 ```
 
-## 常见坑 (h20-09 实测)
+## Common pitfalls (measured on h20-09)
 
-| 症状 | 原因 → 解法 |
+| Symptom | Cause → fix |
 |---|---|
-| `make install` 报 build_editable | pip 太老 → `pip install -U pip` |
-| preflight 全 255 | ssh 不通 (含到自己) → 加 authorized_keys |
-| 起服务后 tool_calls 恒为 [] 且 finish_reason=tool_calls | parser 不匹配 → GLM-5.2 用 `glm47` |
-| loadgen 大量 err 但服务正常 | reasoning 模型短回复全在 reasoning_content → 升级 aa-loadgen submodule |
-| 8000 被占 | 残留旧 frontend → 清进程; GPU 残留看 `nvidia-smi --query-compute-apps=pid` |
+| `make install` fails on build_editable | pip too old → `pip install -U pip` |
+| preflight all rc=255 | ssh unreachable (including to itself) → add the key to authorized_keys |
+| tool_calls always [] though finish_reason=tool_calls | parser mismatch → GLM-5.2 needs `glm47` |
+| loadgen reports many errs while the server looks fine | reasoning models put short replies entirely in reasoning_content → update the aa-loadgen submodule |
+| port 8000 occupied | stale old frontend → kill it; check GPU leftovers via `nvidia-smi --query-compute-apps=pid` |
 
-完整过程见 [docs/exp/2026-07-28-m0-h20-09.md](exp/2026-07-28-m0-h20-09.md)。
+Full walkthrough: [docs/exp/2026-07-28-m0-h20-09.md](exp/2026-07-28-m0-h20-09.md).

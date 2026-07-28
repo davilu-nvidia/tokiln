@@ -1,4 +1,4 @@
-"""monitor HTTP 服务: GET /snapshot /history / (内置白底 HTML)。跑在 server 节点 8100 端口。"""
+"""Monitor HTTP service: GET /snapshot /history / (built-in white-background HTML page). Runs on the server node, port 8100."""
 import asyncio
 import pathlib
 
@@ -66,7 +66,7 @@ def serve(sglang_url: str, runs_dir: pathlib.Path, port: int = 8100, interval: f
         await runner.setup()
         site = web.TCPSite(runner, "0.0.0.0", port)
         await site.start()
-        print(f"tokiln monitor serving on :{port} (snapshot/history/浏览器页) → {sglang_url}")
+        print(f"tokiln monitor serving on :{port} (snapshot/history/browser page) → {sglang_url}")
         while True:
             await asyncio.sleep(3600)
 

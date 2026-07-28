@@ -1,4 +1,4 @@
-"""Probe 基元: 每个 probe 返回 ProbeResult, `tokiln probe all` 汇总为 Go/No-Go。"""
+"""Probe primitives: each probe returns a ProbeResult; `tokiln probe all` aggregates them into Go/No-Go."""
 import dataclasses, json, time
 
 

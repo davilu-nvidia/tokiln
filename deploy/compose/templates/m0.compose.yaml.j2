@@ -1,4 +1,4 @@
-# M0: 单节点纯 SGLang ({{ worker.node }})
+# M0: single-node pure SGLang ({{ worker.node }})
 services:
   sglang:
     image: "{{ versions.components.sglang.image or 'tokiln/sglang-glm52:dev' }}"
@@ -12,4 +12,4 @@ services:
       resources: {reservations: {devices: [{driver: nvidia, device_ids: [{% for g in gpu_ids %}"{{ g }}"{% if not loop.last %}, {% endif %}{% endfor %}], capabilities: [gpu]}]}}
     volumes:
       - {{ model.weights_cache }}:{{ model.weights_cache }}
-    restart: "no"     # M0 故障要暴露, 不自动拉起
+    restart: "no"     # M0 failures must surface; no auto-restart

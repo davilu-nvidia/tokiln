@@ -1,4 +1,4 @@
-"""bench 验收判定 + report 字段契约 (回归: KEYS 与 aa-loadgen 输出漂移致报表全 None)。"""
+"""Bench pass_criteria checks + report field contract (regression: KEYS drifted from aa-loadgen output, all-None report)."""
 import json
 import pathlib
 import shutil
@@ -24,10 +24,10 @@ def test_criteria_absent():
 
 
 def test_report_keys_exist_in_loadgen_output():
-    """契约: aggregate.KEYS 的每个字段都必须真实出现在 aa-loadgen 输出里。"""
+    """Contract: every field in aggregate.KEYS must actually exist in aa-loadgen output."""
     d = json.loads(FIXTURE.read_text())
     missing = [k for k in aggregate.KEYS if k not in d]
-    assert not missing, f"KEYS 与 aa-loadgen 输出漂移: {missing}"
+    assert not missing, f"KEYS drifted from aa-loadgen output: {missing}"
 
 
 def test_compare_renders_table(tmp_path):

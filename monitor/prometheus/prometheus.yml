@@ -1,8 +1,8 @@
-# 持久层采集 (实验期快看板用 aa-loadgen/monitor, 两层以 run_id 关联, 见 monitor/integration.md)
+# Persistent-layer scraping (the experiment-time quick dashboard is aa-loadgen/monitor; the two layers join on run_id, see monitor/integration.md)
 global: {scrape_interval: 5s}
 scrape_configs:
   - job_name: sglang
-    static_configs: [{targets: ["node1:8000", "node2:30001"]}]  # TODO: worker metrics 端口对齐
+    static_configs: [{targets: ["node1:8000", "node2:30001"]}]  # TODO: align worker metrics ports
   - job_name: dcgm
     static_configs: [{targets: ["node1:9400", "node2:9400"]}]
   - job_name: dynamo-frontend

@@ -1,4 +1,4 @@
-# M2 第二步方案 B。与 l3-mooncake.yaml 互斥。
+# M2 step two, option B. Mutually exclusive with l3-mooncake.yaml.
 kv:
   l3:
     backend: flexkv

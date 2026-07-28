@@ -1,4 +1,4 @@
-# 声明式节点清单 —— preflight / render / deploy 的输入。
+# Declarative node inventory — input for preflight / render / deploy.
 cluster:
   name: tokiln-dev
 nodes:
@@ -7,11 +7,11 @@ nodes:
     ssh: {user: root, port: 22}
     roles: [control, worker]
     gpus: {sku: H20-3e-141GB, count: 8, hbm_gb: 141}
-    dram_gb: 2015              # free -g 实测
+    dram_gb: 2015              # measured via free -g
     nvme:  {path: /raid, free_gb_min: 2000}
     rdma:  {devices: [mlx5_0, mlx5_1, mlx5_2], link: roce}   # ibv_devinfo: PORT_ACTIVE
   - name: node2
-    host: 10.6.131.10          # H20-GPU-10 — 已声明未启用 (今日实验只用 node1)
+    host: 10.6.131.10          # H20-GPU-10 — declared but not enabled (current experiments use node1 only)
     enabled: false
     ssh: {user: root, port: 22}
     roles: [worker]

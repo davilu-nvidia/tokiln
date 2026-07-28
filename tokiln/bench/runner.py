@@ -1,5 +1,5 @@
-"""压测编排: workload YAML → aa-loadgen (submodule) 命令行, 统一 run_id 归档。
-原则: 不 fork aa-loadgen; A/B 两 arm 除 router 外逐字节一致。"""
+"""Bench orchestration: workload YAML → aa-loadgen (submodule) command line, archived under a unified run_id.
+Principles: never fork aa-loadgen; the two A/B arms must be byte-identical except for the router."""
 import json, pathlib, shlex, subprocess, time
 from ..config.merge import load_workload
 
@@ -18,7 +18,7 @@ def build_cmd(workload_name: str, url: str, model: str, arm: str,
         cmd += ["--concurrency", str(p.get("concurrency", 8)),
                 "--duration", str(p.get("duration_s", 120))]
         if p.get("seed") is not None:
-            cmd += ["--seed", str(p["seed"])]   # 若 loadgen 无 --seed, 以 PR 加回其 repo
+            cmd += ["--seed", str(p["seed"])]   # if loadgen lacks --seed, add it back via a PR to its repo
     else:  # replay
         cmd += ["--replay", str(ROOT / p["trace"]),
                 "--concurrency", str(p.get("concurrency", 32)),
@@ -29,7 +29,7 @@ def build_cmd(workload_name: str, url: str, model: str, arm: str,
 
 
 def check_criteria(result_path: pathlib.Path, criteria: dict) -> dict:
-    """workload 的 pass_criteria 对照实测结果。声明了标准就必须执行。"""
+    """Compare measured results against the workload's pass_criteria. Declared criteria must be enforced."""
     if not criteria or not result_path.exists():
         return {"evaluated": False}
     d = json.loads(result_path.read_text())
@@ -50,8 +50,8 @@ def check_criteria(result_path: pathlib.Path, criteria: dict) -> dict:
 
 def run(workload_name: str, url: str, model: str, arm: str, run_dir: pathlib.Path) -> dict:
     if not LOADGEN.exists():
-        return {"rc": 3, "error": f"aa-loadgen 未就绪: {LOADGEN} 不存在。"
-                                  "请先执行: git submodule update --init (私有仓库需先配置访问权限)",
+        return {"rc": 3, "error": f"aa-loadgen not ready: {LOADGEN} missing. "
+                                  "Run: git submodule update --init (private repos need access configured first)",
                 "cmd": "", "wall_s": 0.0, "log": ""}
     run_dir.mkdir(parents=True, exist_ok=True)
     cmd = build_cmd(workload_name, url, model, arm, run_dir)
@@ -63,6 +63,6 @@ def run(workload_name: str, url: str, model: str, arm: str, run_dir: pathlib.Pat
     out = run_dir / f"aa_{w.name}_arm{arm}.json"
     verdict = check_criteria(out, w.pass_criteria)
     if rc == 0 and verdict.get("evaluated") and not verdict["pass"]:
-        rc = 4                    # loadgen 正常结束但未达 pass_criteria
+        rc = 4                    # loadgen finished normally but pass_criteria not met
     return {"cmd": shlex.join(cmd), "rc": rc, "wall_s": round(time.time() - t0, 1),
             "log": str(log), "criteria": verdict}

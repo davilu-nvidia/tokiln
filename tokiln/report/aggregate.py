@@ -1,14 +1,15 @@
-"""汇总: 直接消费 aa-loadgen 的 JSON 输出 (aaload/core.py 的 report 结构), 不重复实现指标。
-A/B 两 arm 并排 + 差值; 支持跨多个 run_dir 收集 arm (bench 每个 arm 一个 run_dir)。
-后续接 bench_serving/aiperf 的解析器。"""
+"""Aggregation: consume aa-loadgen's JSON output directly (report structure from aaload/core.py);
+do not re-implement metrics. Two A/B arms side by side + delta column; collects arms across
+multiple run_dirs (bench uses one run_dir per arm).
+Parsers for bench_serving/aiperf to be added later."""
 import json, pathlib
 
-# 与 aaload/core.py build_report 的输出字段严格对齐 (契约)
+# Strictly aligned with the output fields of aaload/core.py build_report (contract)
 KEYS = ["ttft_p50_s", "ttft_p95_s", "tpot_p50_ms", "tpot_p95_ms",
         "e2e_p50_s", "steps_per_min", "throughput_tok_s",
         "out_speed_median_tok_s", "requests_ok", "requests_err", "total_out_tokens"]
 
-# 差值中 "越低越好" 的指标, 用于标注方向
+# Lower-is-better metrics, used to annotate the delta direction
 LOWER_BETTER = {"ttft_p50_s", "ttft_p95_s", "tpot_p50_ms", "tpot_p95_ms", "e2e_p50_s", "requests_err"}
 
 
@@ -26,19 +27,20 @@ def _fmt_delta(a, b, key: str) -> str:
 
 
 def compare(run_dirs: list[pathlib.Path]) -> str:
-    """收集所有 run_dir 下的 aa_*_arm*.json, 按 arm 汇总成一张对比表。
-    结果写入第一个 run_dir 的 report.md。"""
-    if isinstance(run_dirs, pathlib.Path):  # 向后兼容单目录调用
+    """Collect all aa_*_arm*.json under the given run_dirs into one comparison table per arm.
+    The result is written to report.md in the first run_dir."""
+    if isinstance(run_dirs, pathlib.Path):  # backward compat for single-dir calls
         run_dirs = [run_dirs]
     arm_files: dict[str, pathlib.Path] = {}
     for rd in run_dirs:
         for p in sorted(rd.glob("aa_*_arm*.json")):
             arm = p.stem.split("arm")[-1]
             if arm in arm_files:
-                raise ValueError(f"arm {arm} 出现多次: {arm_files[arm]} 与 {p}; 请只传入待对比的 run_dir")
+                raise ValueError(f"arm {arm} appears more than once: {arm_files[arm]} and {p}; "
+                                 "pass only the run_dirs under comparison")
             arm_files[arm] = p
     if not arm_files:
-        raise FileNotFoundError(f"未在 {[str(r) for r in run_dirs]} 找到 aa_*_arm*.json")
+        raise FileNotFoundError(f"no aa_*_arm*.json found under {[str(r) for r in run_dirs]}")
     rows = {arm: load_arm(p) for arm, p in sorted(arm_files.items())}
     arms = list(rows)
 
@@ -52,15 +54,15 @@ def compare(run_dirs: list[pathlib.Path]) -> str:
         if two:
             d = _fmt_delta(rows[arms[0]].get(k), rows[arms[1]].get(k), k)
             if d and k in LOWER_BETTER:
-                d += " ↓更优"
+                d += " ↓ better"
             cells.append(d)
         lines.append("| " + " | ".join(cells) + " |")
 
-    # 契约漂移预警: 若某 arm 的 KEYS 全为 None, 提示实际可用字段
+    # Contract-drift warning: if every expected metric of an arm is None, list the actual fields
     for arm, v in rows.items():
         if all(v.get(k) is None for k in KEYS):
-            lines += ["", f"> ⚠ arm {arm} 的所有预期指标均缺失, loadgen 输出字段为: "
-                          f"{', '.join(v['_raw_keys'][:20])} — 请核对 KEYS 与 aaload/core.py 的契约"]
+            lines += ["", f"> ⚠ every expected metric of arm {arm} is missing; loadgen output fields: "
+                          f"{', '.join(v['_raw_keys'][:20])} — check KEYS against the aaload/core.py contract"]
 
     out = run_dirs[0] / "report.md"
     out.write_text("\n".join(lines) + "\n")

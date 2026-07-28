@@ -7,12 +7,12 @@
   <rect x="0" y="0" width="960" height="1110" fill="#ffffff"/>
 
   <!-- Title -->
-  <text x="480" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#334155">Tokiln 代码架构 — 声明式胶水与验证层</text>
-  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#64748b">自研只做四件事：渲染 / 探针 / 编排压测 / 归档 · 调度、KV、网关全部来自上游，只写配置不写实现</text>
+  <text x="480" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#334155">Tokiln code architecture — declarative glue &amp; verification layer</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#64748b">In-house code does four things only: render / probes / bench orchestration / archiving · scheduling, KV and gateway all come from upstream — config, not implementations</text>
 
   <!-- ============ CLI ============ -->
   <rect x="40" y="70" width="880" height="58" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-  <text x="58" y="104" font-size="13" font-weight="700" fill="#1e3a8a">CLI 入口 · tokiln/cli.py + Makefile</text>
+  <text x="58" y="104" font-size="13" font-weight="700" fill="#1e3a8a">CLI entry · tokiln/cli.py + Makefile</text>
   <g font-size="11.5" fill="#1e3a8a" text-anchor="middle">
     <rect x="330" y="88" width="86" height="24" rx="12" fill="#fff" stroke="#2563eb"/><text x="373" y="104">preflight</text>
     <rect x="426" y="88" width="76" height="24" rx="12" fill="#fff" stroke="#2563eb"/><text x="464" y="104">render</text>
@@ -25,20 +25,20 @@
 
   <!-- ============ configs ============ -->
   <rect x="40" y="152" width="880" height="168" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
-  <text x="58" y="176" font-size="13" font-weight="700" fill="#14532d">configs/ — 唯一事实来源（换运行时只换渲染后端，不改配置语义）</text>
+  <text x="58" y="176" font-size="13" font-weight="700" fill="#14532d">configs/ — single source of truth (switching runtimes swaps the render backend, not config semantics)</text>
   <g>
     <rect x="56" y="188" width="204" height="118" rx="8" fill="#fff" stroke="#16a34a"/>
     <text x="68" y="208" font-size="12" font-weight="700" fill="#14532d">cluster/</text>
-    <text x="68" y="228" font-size="11" fill="#374151">inventory.yaml 节点清单</text>
+    <text x="68" y="228" font-size="11" fill="#374151">inventory.yaml node inventory</text>
     <text x="68" y="245" font-size="11" fill="#374151">(2×8 H20, SSH, RDMA)</text>
     <text x="68" y="262" font-size="11" fill="#374151">host-contract.yaml</text>
-    <text x="68" y="279" font-size="11" fill="#374151">主机能力契约</text>
+    <text x="68" y="279" font-size="11" fill="#374151">host capability contract</text>
   </g>
   <g>
     <rect x="272" y="188" width="204" height="118" rx="8" fill="#fff" stroke="#16a34a"/>
     <text x="284" y="208" font-size="12" font-weight="700" fill="#14532d">models/</text>
     <text x="284" y="228" font-size="11" fill="#374151">glm-5.2.yaml</text>
-    <text x="284" y="245" font-size="11" fill="#374151">context / quant / 权重路径</text>
+    <text x="284" y="245" font-size="11" fill="#374151">context / quant / weights path</text>
     <text x="284" y="262" font-size="11" fill="#374151">reasoning-parser</text>
     <text x="284" y="279" font-size="11" fill="#374151">tool-call-parser</text>
   </g>
@@ -55,45 +55,45 @@
     <rect x="704" y="188" width="204" height="118" rx="8" fill="#fff" stroke="#16a34a"/>
     <text x="716" y="208" font-size="12" font-weight="700" fill="#14532d">workloads/</text>
     <text x="716" y="228" font-size="11" fill="#374151">smoke / steady-highcc</text>
-    <text x="716" y="245" font-size="11" fill="#374151">agentic-synth（合成）</text>
-    <text x="716" y="262" font-size="11" fill="#374151">agentic-replay（真实轨迹）</text>
+    <text x="716" y="245" font-size="11" fill="#374151">agentic-synth (synthetic)</text>
+    <text x="716" y="262" font-size="11" fill="#374151">agentic-replay (real trajectories)</text>
   </g>
   <line x1="480" y1="320" x2="480" y2="344" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- ============ 渲染管线 ============ -->
+  <!-- ============ Render pipeline ============ -->
   <g>
     <rect x="56" y="352" width="260" height="100" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
     <text x="70" y="374" font-size="12.5" font-weight="700" fill="#1e3a8a">config/merge.py + schema.py</text>
-    <text x="70" y="395" font-size="11" fill="#374151">profile ⊕ overlays 深度合并</text>
+    <text x="70" y="395" font-size="11" fill="#374151">profile ⊕ overlays deep merge</text>
     <text x="70" y="412" font-size="11" fill="#374151">→ resolved config + digest</text>
-    <text x="70" y="429" font-size="11" fill="#374151">同一 digest = 同一部署形态</text>
+    <text x="70" y="429" font-size="11" fill="#374151">same digest = same deployment shape</text>
   </g>
   <line x1="316" y1="402" x2="348" y2="402" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <g>
     <rect x="350" y="352" width="260" height="100" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
     <text x="364" y="374" font-size="12.5" font-weight="700" fill="#1e3a8a">render/compose.py</text>
-    <text x="364" y="395" font-size="11" fill="#374151">Jinja2 渲染 deploy/…/*.j2 模板</text>
-    <text x="364" y="412" font-size="11" fill="#374151">生成 SGLang 启动参数</text>
-    <text x="364" y="429" font-size="11" fill="#374151">M3 同接口换 render/dgd.py (K8s)</text>
+    <text x="364" y="395" font-size="11" fill="#374151">Jinja2 renders deploy/…/*.j2 templates</text>
+    <text x="364" y="412" font-size="11" fill="#374151">generates SGLang launch args</text>
+    <text x="364" y="429" font-size="11" fill="#374151">M3 swaps in render/dgd.py (K8s), same interface</text>
   </g>
   <line x1="610" y1="402" x2="642" y2="402" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <g>
     <rect x="644" y="352" width="260" height="100" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
-    <text x="658" y="374" font-size="12.5" font-weight="700" fill="#334155">部署产物 deploy/</text>
-    <text x="658" y="395" font-size="11" fill="#374151">每节点 docker compose (m0/m1)</text>
+    <text x="658" y="374" font-size="12.5" font-weight="700" fill="#334155">deploy artifacts deploy/</text>
+    <text x="658" y="395" font-size="11" fill="#374151">per-node docker compose (m0/m1)</text>
     <text x="658" y="412" font-size="11" fill="#374151">Dockerfile.dynamo / .sglang-glm52</text>
-    <text x="658" y="429" font-size="11" fill="#374151">VERSIONS.lock 版本 pin</text>
+    <text x="658" y="429" font-size="11" fill="#374151">VERSIONS.lock version pins</text>
   </g>
   <line x1="480" y1="458" x2="480" y2="486" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="492" y="478" font-size="10.5" fill="#64748b">scp + docker compose up（M0 人工确认，M1 起 --apply）</text>
+  <text x="492" y="478" font-size="10.5" fill="#64748b">scp + docker compose up (human-confirmed in M0, --apply from M1)</text>
 
-  <!-- ============ 运行时栈 ============ -->
+  <!-- ============ Runtime stack ============ -->
   <rect x="40" y="490" width="880" height="292" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="58" y="514" font-size="13" font-weight="700" fill="#78350f">运行时栈 — 全部上游组件（虚线框内不含任何自研实现）</text>
+  <text x="58" y="514" font-size="13" font-weight="700" fill="#78350f">Runtime stack — all upstream components (nothing in-house inside the dashed box)</text>
 
   <rect x="190" y="526" width="430" height="60" rx="8" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
-  <text x="405" y="548" text-anchor="middle" font-size="12.5" font-weight="700" fill="#78350f">Dynamo Frontend（OpenAI 兼容 SSE）</text>
-  <text x="405" y="568" text-anchor="middle" font-size="11" fill="#374151">ThunderAgent Router · program/KV-aware · NATS + etcd 服务发现</text>
+  <text x="405" y="548" text-anchor="middle" font-size="12.5" font-weight="700" fill="#78350f">Dynamo Frontend (OpenAI-compatible SSE)</text>
+  <text x="405" y="568" text-anchor="middle" font-size="11" fill="#374151">ThunderAgent Router · program/KV-aware · NATS + etcd discovery</text>
 
   <line x1="330" y1="586" x2="290" y2="608" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <line x1="480" y1="586" x2="530" y2="608" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -113,8 +113,8 @@
   <line x1="260" y1="684" x2="330" y2="710" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <line x1="580" y1="684" x2="510" y2="710" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <rect x="250" y="712" width="340" height="48" rx="8" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
-  <text x="420" y="732" text-anchor="middle" font-size="12" font-weight="700" fill="#78350f">L3 KV Store（跨节点 RDMA）</text>
-  <text x="420" y="750" text-anchor="middle" font-size="11" fill="#374151">mooncake / flexkv — overlay 二选一叠加，代码零感知</text>
+  <text x="420" y="732" text-anchor="middle" font-size="12" font-weight="700" fill="#78350f">L3 KV Store (cross-node RDMA)</text>
+  <text x="420" y="750" text-anchor="middle" font-size="11" fill="#374151">mooncake / flexkv — stack one of two overlays, code stays oblivious</text>
 
   <g>
     <rect x="742" y="610" width="160" height="102" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
@@ -122,39 +122,39 @@
     <text x="822" y="652" text-anchor="middle" font-size="11" fill="#374151">Prometheus</text>
     <text x="822" y="669" text-anchor="middle" font-size="11" fill="#374151">+ Grafana</text>
     <text x="822" y="690" text-anchor="middle" font-size="10.5" fill="#374151">request/session ID</text>
-    <text x="822" y="705" text-anchor="middle" font-size="10.5" fill="#374151">贯穿三层</text>
+    <text x="822" y="705" text-anchor="middle" font-size="10.5" fill="#374151">spans all three layers</text>
   </g>
   <line x1="720" y1="640" x2="742" y2="640" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4 3"/>
 
-  <!-- 验证箭头 (向上进入 runtime) -->
+  <!-- verification arrows (upward into the runtime) -->
   <line x1="186" y1="836" x2="186" y2="786" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr)"/>
-  <text x="196" y="812" font-size="10.5" fill="#64748b">SSH 只读（部署前）</text>
+  <text x="196" y="812" font-size="10.5" fill="#64748b">read-only SSH (pre-deploy)</text>
   <line x1="480" y1="836" x2="480" y2="786" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="490" y="812" font-size="10.5" fill="#64748b">HTTP /v1（部署后）</text>
+  <text x="490" y="812" font-size="10.5" fill="#64748b">HTTP /v1 (post-deploy)</text>
   <line x1="774" y1="836" x2="774" y2="786" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="784" y="812" font-size="10.5" fill="#64748b">压测流量</text>
+  <text x="784" y="812" font-size="10.5" fill="#64748b">load-test traffic</text>
 
-  <!-- ============ 验证层 ============ -->
+  <!-- ============ Verification layer ============ -->
   <g>
     <rect x="56" y="838" width="260" height="96" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-    <text x="70" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">preflight/ — 部署前检查</text>
-    <text x="70" y="881" font-size="11" fill="#374151">host.py + rdma.py（绝不改目标机）</text>
-    <text x="70" y="898" font-size="11" fill="#374151">GPU/CUDA/Docker/磁盘/RDMA 采集</text>
-    <text x="70" y="915" font-size="11" fill="#374151">对照 host-contract → go / no-go</text>
+    <text x="70" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">preflight/ — pre-deploy checks</text>
+    <text x="70" y="881" font-size="11" fill="#374151">host.py + rdma.py (never modifies targets)</text>
+    <text x="70" y="898" font-size="11" fill="#374151">collects GPU/CUDA/Docker/disk/RDMA</text>
+    <text x="70" y="915" font-size="11" fill="#374151">vs host-contract → go / no-go</text>
   </g>
   <g>
     <rect x="350" y="838" width="260" height="96" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-    <text x="364" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">probes/ — 能力探针</text>
+    <text x="364" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">probes/ — capability probes</text>
     <text x="364" y="881" font-size="11" fill="#374151">streaming · cancel · parser ·</text>
     <text x="364" y="898" font-size="11" fill="#374151">hicache · stack（+ kv_events）</text>
-    <text x="364" y="915" font-size="11" fill="#374151">汇总 GO / NO-GO，不假设组合可用</text>
+    <text x="364" y="915" font-size="11" fill="#374151">aggregate GO / NO-GO; never assume the combo works</text>
   </g>
   <g>
     <rect x="644" y="838" width="260" height="96" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-    <text x="658" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">bench/runner.py — 压测编排</text>
+    <text x="658" y="860" font-size="12.5" font-weight="700" fill="#1e3a8a">bench/runner.py — bench orchestration</text>
     <text x="658" y="881" font-size="11" fill="#374151">third_party/aa-loadgen（submodule）</text>
-    <text x="658" y="898" font-size="11" fill="#374151">synth 合成 + 真实轨迹 replay</text>
-    <text x="658" y="915" font-size="11" fill="#374151">A/B 两 arm 仅 router 不同</text>
+    <text x="658" y="898" font-size="11" fill="#374151">synth + real-trajectory replay</text>
+    <text x="658" y="915" font-size="11" fill="#374151">A/B arms differ only in the router</text>
   </g>
 
   <!-- report → runs -->
@@ -163,24 +163,24 @@
   <line x1="774" y1="934" x2="500" y2="972" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <g>
     <rect x="200" y="966" width="300" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-    <text x="214" y="988" font-size="12.5" font-weight="700" fill="#1e3a8a">report/ — 归档与对比</text>
+    <text x="214" y="988" font-size="12.5" font-weight="700" fill="#1e3a8a">report/ — archiving &amp; comparison</text>
     <text x="214" y="1009" font-size="11" fill="#374151">manifest.py：git sha + config digest</text>
-    <text x="214" y="1026" font-size="11" fill="#374151">+ 镜像 digest + seed · aggregate.py A/B 对比</text>
+    <text x="214" y="1026" font-size="11" fill="#374151">+ image digest + seed · aggregate.py A/B comparison</text>
   </g>
   <line x1="500" y1="1006" x2="538" y2="1006" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
   <g>
     <rect x="540" y="966" width="280" height="80" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
     <text x="554" y="988" font-size="12.5" font-weight="700" fill="#334155">runs/&lt;run_id&gt;/</text>
-    <text x="554" y="1009" font-size="11" fill="#374151">manifest.json + 原始 JSONL + 渲染产物</text>
-    <text x="554" y="1026" font-size="11" fill="#374151">完整可复现坐标，可交叉定位</text>
+    <text x="554" y="1009" font-size="11" fill="#374151">manifest.json + raw JSONL + rendered artifacts</text>
+    <text x="554" y="1026" font-size="11" fill="#374151">full reproducibility coordinates, cross-referencable</text>
   </g>
 
   <!-- Legend -->
   <g font-size="11" fill="#64748b">
-    <rect x="120" y="1070" width="14" height="14" rx="3" fill="#dbeafe" stroke="#2563eb"/><text x="140" y="1081">自研代码（tokiln/）</text>
-    <rect x="278" y="1070" width="14" height="14" rx="3" fill="#dcfce7" stroke="#16a34a"/><text x="298" y="1081">声明式配置</text>
-    <rect x="400" y="1070" width="14" height="14" rx="3" fill="#fef3c7" stroke="#d97706" stroke-dasharray="4 3"/><text x="420" y="1081">上游组件（只写配置）</text>
-    <rect x="580" y="1070" width="14" height="14" rx="3" fill="#f1f5f9" stroke="#64748b"/><text x="600" y="1081">产物 / 归档</text>
-    <rect x="700" y="1070" width="14" height="14" rx="3" fill="#ede9fe" stroke="#7c3aed"/><text x="720" y="1081">可观测</text>
+    <rect x="120" y="1070" width="14" height="14" rx="3" fill="#dbeafe" stroke="#2563eb"/><text x="140" y="1081">in-house code (tokiln/)</text>
+    <rect x="278" y="1070" width="14" height="14" rx="3" fill="#dcfce7" stroke="#16a34a"/><text x="298" y="1081">declarative config</text>
+    <rect x="400" y="1070" width="14" height="14" rx="3" fill="#fef3c7" stroke="#d97706" stroke-dasharray="4 3"/><text x="420" y="1081">upstream components (config only)</text>
+    <rect x="580" y="1070" width="14" height="14" rx="3" fill="#f1f5f9" stroke="#64748b"/><text x="600" y="1081">artifacts / archives</text>
+    <rect x="700" y="1070" width="14" height="14" rx="3" fill="#ede9fe" stroke="#7c3aed"/><text x="720" y="1081">observability</text>
   </g>
 </svg>

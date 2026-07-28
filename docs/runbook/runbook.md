@@ -1,23 +1,24 @@
 # Tokiln Runbook (M0–M1)
 
-## 部署
-1. `tokiln preflight` — go=false 则按报告修机器, 不带病部署
-2. `tokiln render --profile m0-sglang-only` — 得到 run_dir 与每节点 compose
-3. 将 run_dir 下 compose scp 至对应节点, `docker compose up -d`
+## Deploy
+1. `tokiln preflight` — if go=false, fix the machine per the report; never deploy sick
+2. `tokiln render --profile m0-sglang-only` — produces a run_dir with per-node compose files
+3. scp the compose files to their nodes, `docker compose up -d`
 4. `tokiln probe all --url http://node1:8000/v1 --model glm52`
 
-## 压测
+## Load testing
 - smoke: `tokiln bench --workload smoke --arm A`
-- A/B:  两次 bench 仅换 profile 的 router.kind (或 run_exp 风格切模型名), 其余参数不动
-- 汇总: 单 arm `tokiln report runs/<run_id>`; A/B 传两个目录 `tokiln report runs/<armA_run> runs/<armB_run>` (自动出并排表 + 差值列)
+- A/B: two bench runs differing only in the profile's router.kind (or run_exp-style model-name switch); everything else identical
+- Aggregate: single arm `tokiln report runs/<run_id>`; for A/B pass two dirs `tokiln report runs/<armA_run> runs/<armB_run>` (side-by-side table + delta column)
 
-## 看瓶颈
-- 快看板: third_party/aa-loadgen/monitor (5s 粒度)
-- 持久: Grafana :3000 (GPU/引擎/请求三层 dashboard)
+## Watching for bottlenecks
+- Live: `make monitor-serve` on the serving node, then `tokiln monitor watch` from any terminal, or open :8100 in a browser
+- Quick dashboard: third_party/aa-loadgen/monitor (5s granularity)
+- Persistent: Grafana :3000 (GPU / engine / request dashboards)
 
-## 升级/回滚
-- 只允许通过改 VERSIONS.lock + 重新 build/render 升级; 禁止容器内就地 pip/apt
-- 回滚 = checkout 旧 commit 重新 render (digest 可比对)
+## Upgrade / rollback
+- Upgrades only via VERSIONS.lock changes + rebuild/re-render; no in-place pip/apt inside containers
+- Rollback = checkout an older commit and re-render (digests are comparable)
 
-## 删除
-- `docker compose down` 逐节点; runs/ 归档保留
+## Teardown
+- `docker compose down` per node; keep runs/ archives

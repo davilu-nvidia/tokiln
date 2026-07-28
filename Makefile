@@ -16,7 +16,7 @@ smoke:
 	python -m tokiln.cli bench --workload smoke --arm A --profile $${PROFILE:-m0-sglang-only} --url $${URL:-http://localhost:8000/v1}
 bench-ab:
 	python -m tokiln.cli bench --workload agentic-replay --arm A
-	@echo ">>> 切换 router (glm52ta -> glm52 或改 profile) 后:"
+	@echo ">>> after switching the router (glm52ta -> glm52, or change the profile):"
 	@echo "python -m tokiln.cli bench --workload agentic-replay --arm B"
 monitor-serve:
 	python -m tokiln.cli monitor serve --sglang $${SGLANG:-http://localhost:8000}

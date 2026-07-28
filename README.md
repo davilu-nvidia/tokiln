@@ -1,24 +1,27 @@
 # Tokiln
 
-把 2×8 H20(141GB) 变成可部署、可调用、可观察、可压测的 GLM-5.2 Token 服务。
-栈: NVIDIA Dynamo + SGLang + ThunderAgent router + HiCache (L2 host offload, L3 mooncake/flexkv 可切)。
+Turn 2×8 H20 (141GB) into a deployable, callable, observable, load-testable GLM-5.2 token service.
+Stack: NVIDIA Dynamo + SGLang + ThunderAgent router + HiCache (L2 host offload; L3 mooncake/flexkv switchable).
 
-- 设计文档: [docs/design/tokiln-code-structure.md](docs/design/tokiln-code-structure.md)
-- 架构图: [docs/design/tokiln-architecture.svg](docs/design/tokiln-architecture.svg)
+- Design doc: [docs/design/tokiln-code-structure.md](docs/design/tokiln-code-structure.md)
+- Architecture diagram: [docs/design/tokiln-architecture.svg](docs/design/tokiln-architecture.svg)
 
-![Tokiln 代码架构](docs/design/tokiln-architecture.svg)
-- 压测器: [third_party/aa-loadgen](https://github.com/davilu-nvidia/aa-loadgen) (submodule; synth + 真实轨迹 replay)
-- 里程碑: M0 单节点纯 SGLang → M1 Dynamo+TA 双节点 A/B → M2 HiCache L2→L3 → M3 K8s 化
+![Tokiln code architecture](docs/design/tokiln-architecture.svg)
+- Load generator: [third_party/aa-loadgen](https://github.com/davilu-nvidia/aa-loadgen) (submodule; synth + real-trajectory replay)
+- Milestones: M0 single-node pure SGLang → M1 Dynamo+TA two-node A/B → M2 HiCache L2→L3 → M3 Kubernetes
 
 ```bash
 make install
-make preflight            # SSH 只读检查 2 节点
-make m0-render            # 声明式配置 → compose (带 config digest)
-make probe                # streaming/cancel/parser/hicache/stack 五探针 Go/No-Go
+make preflight            # read-only SSH checks across enabled nodes
+make m0-render            # declarative config → compose (with config digest)
+make probe                # streaming/cancel/parser/hicache/stack five-probe Go/No-Go
 make smoke && make bench-ab
+make monitor-serve        # :8100 — then `tokiln monitor watch` from any terminal (win/mac/linux)
 ```
 
-原则: 自研代码只做 渲染/探针/编排/归档 四件事; 调度、KV、网关全部来自上游, 只写配置不写实现。
-每次运行落 `runs/<run_id>/manifest.json` (git sha + config digest + 镜像 digest + seed), 保证可复现。
+Principle: in-house code does exactly four things — render / probe / bench orchestration / archiving.
+Scheduling, KV, and the gateway all come from upstream; we write config, not implementations.
+Every run archives `runs/<run_id>/manifest.json` (git sha + config digest + image digest + seed) for reproducibility.
 
-**当前状态**: M0 脚手架。所有 `TODO(spike NN)` 标记处等待 ta-repro 考古与四个兼容性 spike 回填。
+**Status**: M0 passed end-to-end on h20-09 (2026-07-28, see [docs/exp](docs/exp/2026-07-28-m0-h20-09.md)).
+Remaining `TODO(spike NN)` markers await the ta-repro archaeology and the four compatibility spikes.

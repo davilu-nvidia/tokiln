@@ -1,9 +1,9 @@
-# M1 worker 节点: {{ worker.node }} (frontend 仅在 {{ profile.frontend.node }} 上启用)
+# M1 worker node: {{ worker.node }} (frontend enabled only on {{ profile.frontend.node }})
 services:
 {% if worker.node == profile.frontend.node %}
   dynamo-frontend:
     image: "{{ versions.components.dynamo.image or 'tokiln/dynamo:dev' }}"
-    # TODO(spike 02): frontend + {{ profile.router.kind }} router 启动命令, 对齐实际 dynamo CLI
+    # TODO(spike 02): frontend + {{ profile.router.kind }} router launch command, aligned with the actual dynamo CLI
     command: ["sleep", "infinity"]
     network_mode: host
 {% endif %}

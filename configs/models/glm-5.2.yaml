@@ -1,12 +1,12 @@
 model:
   name: glm-5.2
-  local_dir: GLM-5.2-FP8    # /raid/model_hub/GLM-5.2-FP8 (h20-09 实测)
-  source: ""                    # TODO: hf://... 或内部镜像 URI (license 确认后填)
+  local_dir: GLM-5.2-FP8    # /raid/model_hub/GLM-5.2-FP8 (measured on h20-09)
+  source: ""                    # TODO: hf://... or internal mirror URI (after license confirmation)
   revision: ""                  # pin commit
-  quant: fp8                    # M0 spike 确认 fp8 checkpoint 可得性; 否则 bf16
+  quant: fp8                    # M0 spike confirmed fp8 checkpoint availability; else bf16
   context_len: 131072
-  served_model_name: glm52      # 与 ta-repro 现状对齐: glm52 / glm52ta 由 router 决定
+  served_model_name: glm52      # aligned with the ta-repro status quo: glm52 / glm52ta decided by the router
   chat_template: glm-5.2
-  reasoning_parser: glm45       # spike 01 验证实际 parser 名
-  tool_call_parser: glm47      # 模板 auto-detect 为 glm47; glm45 已废弃, 解析不了 <arg_key>/<arg_value> 格式
+  reasoning_parser: glm45       # verified working (spike 01)
+  tool_call_parser: glm47      # template auto-detect says glm47; glm45 is deprecated and cannot parse the <arg_key>/<arg_value> format
   weights_cache: /raid/model_hub

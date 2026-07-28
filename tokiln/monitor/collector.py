@@ -1,5 +1,6 @@
-"""指标采集: sglang /metrics + nvidia-smi + 客户端 loadgen progress → 快照/时序。
-契约 (monitor/integration.md): 采集器单实例; GPU 真相以 nvidia-smi 为准; 低基数 label。"""
+"""Metrics collection: sglang /metrics + nvidia-smi + client loadgen progress → snapshot/history.
+Contract (monitor/integration.md): single collector instance; nvidia-smi is the source of truth
+for GPU state; low-cardinality labels only."""
 import glob
 import os
 import pathlib
@@ -9,7 +10,7 @@ import time
 
 import httpx
 
-# sglang 指标 (nightly 命名, 带 sglang: 前缀; 多 tp_rank 的取首个样本)
+# sglang metrics (nightly naming, "sglang:" prefix; for per-tp_rank series take the first sample)
 _GAUGES = {
     "running": r"sglang:num_running_reqs",
     "queued": r"sglang:num_queue_reqs",
@@ -80,7 +81,7 @@ def scrape_gpu() -> list[dict]:
 
 
 def scrape_client(runs_dir: pathlib.Path, fresh_s: float = 300.0) -> dict:
-    """最新 loadgen progress 文件 (aa-loadgen replay/synth 都写 <out>.progress)。"""
+    """Newest loadgen progress file (both aa-loadgen replay and synth write <out>.progress)."""
     cands = glob.glob(str(runs_dir / "*" / "*.progress"))
     if not cands:
         return {"active": False}

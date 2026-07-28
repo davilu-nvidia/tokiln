@@ -1,5 +1,5 @@
-"""SSH 只读 preflight: GPU/驱动/CUDA/磁盘/端口。绝不修改目标机。
-实现方式: ssh <host> <cmd> 采集 → 与 host-contract.yaml 比对。"""
+"""Read-only SSH preflight: GPU / driver / CUDA / disk / ports. Never modifies the target machine.
+Implementation: ssh <host> <cmd> to collect facts, then compare against host-contract.yaml."""
 import json, pathlib, shlex, subprocess
 import yaml
 

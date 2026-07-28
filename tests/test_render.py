@@ -1,5 +1,5 @@
-"""render 契约测试: 所有 profile × overlay 组合渲染成功且产物结构正确。
-今天 (2026-07-28) h20-09 M0 实测抓到的问题在此固化为回归项。"""
+"""Render contract tests: every profile × overlay combo renders and the artifacts are well-formed.
+Issues caught during the 2026-07-28 h20-09 M0 run are pinned here as regressions."""
 import pathlib
 import subprocess
 
@@ -21,10 +21,10 @@ COMBOS = [
 def test_render_all_profiles(tmp_path, profile, overlays):
     resolved = load_resolved(profile, overlays)
     files = compose_render.render(resolved, tmp_path)
-    assert files, "渲染无产物"
+    assert files, "render produced no artifacts"
     for f in files:
         assert f.exists() and f.stat().st_size > 0
-        yaml.safe_load(f.read_text())          # 至少是合法 YAML
+        yaml.safe_load(f.read_text())          # at minimum, valid YAML
 
 
 def test_l3_overlays_mutually_exclusive():
@@ -33,16 +33,16 @@ def test_l3_overlays_mutually_exclusive():
 
 
 def test_model_path_uses_local_dir(tmp_path):
-    """回归: /raid/model_hub 实际目录名 (GLM-5.2-FP8) 与 model.name (glm-5.2) 不同。"""
+    """Regression: the actual dir name under /raid/model_hub (GLM-5.2-FP8) differs from model.name (glm-5.2)."""
     resolved = load_resolved("m0-sglang-only")
-    assert resolved["model"]["local_dir"], "glm-5.2.yaml 应声明 local_dir"
+    assert resolved["model"]["local_dir"], "glm-5.2.yaml must declare local_dir"
     files = compose_render.render(resolved, tmp_path)
     text = files[0].read_text()
     assert f"--model-path {resolved['model']['weights_cache']}/{resolved['model']['local_dir']}" in text
 
 
 def test_tool_call_parser_not_deprecated(tmp_path):
-    """回归: glm45 已被 sglang 废弃且解析不了 GLM-5.2 的 <arg_key>/<arg_value> 格式。"""
+    """Regression: glm45 is deprecated in sglang and cannot parse GLM-5.2's <arg_key>/<arg_value> format."""
     resolved = load_resolved("m0-sglang-only")
     assert resolved["model"]["tool_call_parser"] == "glm47"
 
@@ -54,9 +54,9 @@ def test_gpu_ids_expansion():
 
 
 def test_compose_config_valid(tmp_path):
-    """渲染产物能过 docker compose config (CI runner 有 docker 时)。"""
+    """Rendered artifacts must pass docker compose config (when the CI runner has docker)."""
     if subprocess.run(["docker", "compose", "version"], capture_output=True).returncode:
-        pytest.skip("docker compose 不可用")
+        pytest.skip("docker compose unavailable")
     resolved = load_resolved("m0-sglang-only")
     files = compose_render.render(resolved, tmp_path)
     r = subprocess.run(["docker", "compose", "-f", str(files[0]), "config", "-q"],

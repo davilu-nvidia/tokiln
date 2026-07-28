@@ -1,4 +1,4 @@
-# M1 infra (跑在 {{ profile.infra.nats }}): NATS + etcd + Prometheus + Grafana
+# M1 infra (runs on {{ profile.infra.nats }}): NATS + etcd + Prometheus + Grafana
 services:
   nats:
     image: "{{ versions.components.nats.image }}"

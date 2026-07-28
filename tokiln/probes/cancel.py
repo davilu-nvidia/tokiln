@@ -1,10 +1,11 @@
-"""取消探针 (验收门槛): 断开 SSE 后, 服务端不得继续无界消耗 GPU。
-判据: 断开后轮询 /metrics, running/queue 请求数在 grace 期内回落。"""
+"""Cancellation probe (acceptance gate): after the SSE client disconnects, the server
+must not keep consuming GPU without bound.
+Criterion: poll /metrics after disconnect; running/queued requests must drain within the grace window."""
 import asyncio, re
 import httpx
 from .base import timed
 
-RUNNING_PAT = re.compile(r"num_running_reqs[^ ]* (\d+(?:\.\d+)?)")  # TODO(spike 01): 对齐实际 metric 名
+RUNNING_PAT = re.compile(r"num_running_reqs[^ ]* (\d+(?:\.\d+)?)")  # TODO(spike 01): align with actual metric name
 
 
 async def _running(c: httpx.AsyncClient, metrics_url: str) -> float:
@@ -16,7 +17,7 @@ async def _running(c: httpx.AsyncClient, metrics_url: str) -> float:
 @timed("cancel")
 async def run(url: str, model: str, metrics_url: str, grace_s: float = 60.0):
     body = {"model": model, "stream": True,
-            "messages": [{"role": "user", "content": "写一篇一万字的技术长文, 不要停。"}],
+            "messages": [{"role": "user", "content": "Write a 10000-word technical essay. Do not stop."}],
             "max_tokens": 8192}
     async with httpx.AsyncClient(timeout=60) as c:
         task = None
@@ -25,8 +26,8 @@ async def run(url: str, model: str, metrics_url: str, grace_s: float = 60.0):
                 async for _ in r.aiter_lines():
                     pass
         task = asyncio.create_task(fire())
-        await asyncio.sleep(3)          # 让请求进入 decode
-        task.cancel()                    # 客户端断开
+        await asyncio.sleep(3)          # let the request enter decode
+        task.cancel()                    # client disconnects
         try:
             await task
         except (asyncio.CancelledError, httpx.HTTPError):
@@ -39,7 +40,7 @@ async def run(url: str, model: str, metrics_url: str, grace_s: float = 60.0):
             if last == 0:
                 drain = round(asyncio.get_event_loop().time() - t_disc, 1)
                 return True, {"drain_s": drain,
-                              "note": "断开后请求有界回落; h20-09 实测 sglang 约 35-40s 才 abort"}
+                              "note": "bounded drain after disconnect; measured ~35-40s until sglang aborts on h20-09"}
             await asyncio.sleep(1)
     return False, {"running_after_grace": last,
-                   "hint": "请求泄漏: 检查 frontend abort 传播与 sglang abort_request"}
+                   "hint": "request leak: check frontend abort propagation and sglang abort_request"}

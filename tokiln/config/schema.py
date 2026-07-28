@@ -1,5 +1,5 @@
-"""Pydantic schema: configs/ 下 YAML 的强类型定义。
-校验失败即部署失败 —— 这是 "在部署前明确失败" 原则的第一道门。"""
+"""Pydantic schema: strong types for the YAML under configs/.
+Validation failure = deployment failure — the first gate of the "fail explicitly before deploy" principle."""
 from typing import Literal, Optional
 from pydantic import BaseModel, Field, model_validator
 
@@ -18,7 +18,7 @@ class GPUSpec(BaseModel):
 class Node(BaseModel):
     name: str
     host: str
-    enabled: bool = True   # false = 已声明但暂不参与 preflight/deploy (规格仍可被校验引用)
+    enabled: bool = True   # false = declared but excluded from preflight/deploy (specs stay referencable)
     ssh: SSH = SSH()
     roles: list[str] = ["worker"]
     gpus: GPUSpec
@@ -40,7 +40,7 @@ class Inventory(BaseModel):
 
 class ModelSpec(BaseModel):
     name: str
-    local_dir: str = ""   # weights_cache 下实际目录名, 缺省用 name
+    local_dir: str = ""   # actual directory name under weights_cache; defaults to name
     source: str = ""
     revision: str = ""
     quant: Literal["fp8", "bf16"] = "fp8"
@@ -72,7 +72,7 @@ class KVSpec(BaseModel):
     @model_validator(mode="after")
     def _l3_requires_l2(self):
         if self.l3 and not (self.l2 and self.l2.get("enabled")):
-            raise ValueError("L3 KV 需要先启用 L2 (hicache-l2 overlay); 分层不可跳级")
+            raise ValueError("L3 KV requires L2 first (hicache-l2 overlay); tiers must not skip levels")
         return self
 
 
@@ -89,7 +89,7 @@ class ServingProfile(BaseModel):
     @model_validator(mode="after")
     def _dynamo_needs_router(self):
         if self.runtime == "dynamo" and self.router is None:
-            raise ValueError("runtime=dynamo 必须声明 router")
+            raise ValueError("runtime=dynamo requires a router declaration")
         return self
 
 

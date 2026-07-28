@@ -1,7 +1,7 @@
-"""终端实时看板 (win/mac/linux 通用, 仅 stdlib)。
-用法: python -m tokiln.monitor.watch --url http://10.6.131.9:8100
-     或 tokiln monitor watch --url ...
-单文件无第三方依赖 —— 没装 tokiln 的机器可直接拷这个文件运行。"""
+"""Live terminal dashboard (Windows / macOS / Linux, stdlib only).
+Usage: python -m tokiln.monitor.watch --url http://10.6.131.9:8100
+   or: tokiln monitor watch --monitor-url ...
+Single file with zero third-party deps — machines without tokiln installed can just copy this file."""
 import argparse
 import json
 import os
@@ -48,7 +48,7 @@ def render(snap: dict, hist: list) -> str:
         util = " ".join(f"{int(g['util_pct']):3d}" for g in gpus)
         avg_mem = sum(g["mem_used_gb"] for g in gpus) / len(gpus)
         pw = sum(g["power_w"] for g in gpus)
-        L.append(f"│ GPU util% [{util}]  mem {avg_mem:.0f}G/卡  power {pw:.0f}W")
+        L.append(f"│ GPU util% [{util}]  mem {avg_mem:.0f}G/gpu  power {pw:.0f}W")
     if hist:
         L.append(f"│ tput  {spark([h['gen_throughput'] for h in hist])}")
         L.append(f"│ run#  {spark([h['running'] for h in hist])}")
@@ -57,20 +57,20 @@ def render(snap: dict, hist: list) -> str:
     if cli.get("active"):
         L.append(f"│ client [{cli.get('run','')}] {cli.get('progress','')}")
     else:
-        L.append("│ client: idle (无进行中的 loadgen)")
+        L.append("│ client: idle (no loadgen in progress)")
     L.append("└" + "─" * 78)
     return "\n".join(L)
 
 
 def main():
-    ap = argparse.ArgumentParser(description="tokiln 终端监控看板")
-    ap.add_argument("--url", default="http://localhost:8100", help="monitor serve 地址")
+    ap = argparse.ArgumentParser(description="tokiln live terminal dashboard")
+    ap.add_argument("--url", default="http://localhost:8100", help="monitor serve address")
     ap.add_argument("--interval", type=float, default=2.0)
-    ap.add_argument("--once", action="store_true", help="只渲染一帧 (调试/截图用)")
+    ap.add_argument("--once", action="store_true", help="render a single frame (debug/screenshot)")
     args = ap.parse_args()
 
     if os.name == "nt":
-        os.system("")          # 激活 Win10+ 终端的 ANSI 转义支持
+        os.system("")          # enable ANSI escapes on Windows 10+ terminals
     base = args.url.rstrip("/")
     err_streak = 0
     while True:
@@ -81,7 +81,7 @@ def main():
             err_streak = 0
         except Exception as e:
             err_streak += 1
-            frame = f"┌─ tokiln monitor ── 连不上 {base} ({e})\n└" + "─" * 78
+            frame = f"┌─ tokiln monitor ── cannot reach {base} ({e})\n└" + "─" * 78
             if args.once or err_streak > 30:
                 print(frame)
                 sys.exit(1)
