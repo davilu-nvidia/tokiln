@@ -1,5 +1,6 @@
 model:
   name: glm-5.2
+  local_dir: GLM-5.2-FP8    # /raid/model_hub/GLM-5.2-FP8 (h20-09 实测)
   source: ""                    # TODO: hf://... 或内部镜像 URI (license 确认后填)
   revision: ""                  # pin commit
   quant: fp8                    # M0 spike 确认 fp8 checkpoint 可得性; 否则 bf16

@@ -39,6 +39,7 @@ class Inventory(BaseModel):
 
 class ModelSpec(BaseModel):
     name: str
+    local_dir: str = ""   # weights_cache 下实际目录名, 缺省用 name
     source: str = ""
     revision: str = ""
     quant: Literal["fp8", "bf16"] = "fp8"

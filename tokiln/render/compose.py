@@ -24,7 +24,7 @@ def _gpu_ids(spec: str) -> list[str]:
 def _sglang_args(model: dict, worker: dict, kv: dict, extra: dict) -> list[str]:
     """由 resolved config 生成 sglang 启动参数。UNPINNED 项在此集中, 便于 ta-repro 考古后统一替换。"""
     a = [
-        f"--model-path {model['weights_cache']}/{model['name']}",
+        f"--model-path {model['weights_cache']}/{model.get('local_dir') or model['name']}",
         f"--served-model-name {model['served_model_name']}",
         f"--tp-size {worker['parallel'].get('tp', 8)}",
         f"--mem-fraction-static {worker['mem_fraction']}",
