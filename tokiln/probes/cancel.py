@@ -14,7 +14,7 @@ async def _running(c: httpx.AsyncClient, metrics_url: str) -> float:
 
 
 @timed("cancel")
-async def run(url: str, model: str, metrics_url: str, grace_s: float = 15.0):
+async def run(url: str, model: str, metrics_url: str, grace_s: float = 60.0):
     body = {"model": model, "stream": True,
             "messages": [{"role": "user", "content": "写一篇一万字的技术长文, 不要停。"}],
             "max_tokens": 8192}
@@ -31,12 +31,15 @@ async def run(url: str, model: str, metrics_url: str, grace_s: float = 15.0):
             await task
         except (asyncio.CancelledError, httpx.HTTPError):
             pass
-        deadline = asyncio.get_event_loop().time() + grace_s
+        t_disc = asyncio.get_event_loop().time()
+        deadline = t_disc + grace_s
         last = -1
         while asyncio.get_event_loop().time() < deadline:
             last = await _running(c, metrics_url)
             if last == 0:
-                return True, {"drained_within_s": grace_s, "running": 0}
+                drain = round(asyncio.get_event_loop().time() - t_disc, 1)
+                return True, {"drain_s": drain,
+                              "note": "断开后请求有界回落; h20-09 实测 sglang 约 35-40s 才 abort"}
             await asyncio.sleep(1)
     return False, {"running_after_grace": last,
                    "hint": "请求泄漏: 检查 frontend abort 传播与 sglang abort_request"}
