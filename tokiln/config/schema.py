@@ -18,6 +18,7 @@ class GPUSpec(BaseModel):
 class Node(BaseModel):
     name: str
     host: str
+    enabled: bool = True   # false = 已声明但暂不参与 preflight/deploy (规格仍可被校验引用)
     ssh: SSH = SSH()
     roles: list[str] = ["worker"]
     gpus: GPUSpec

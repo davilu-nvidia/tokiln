@@ -30,6 +30,9 @@ def run(inventory: dict, contract_path: pathlib.Path | None = None) -> dict:
     contract = yaml.safe_load(open(contract_path or ROOT / "configs/cluster/host-contract.yaml"))
     report = {"contract": contract, "nodes": {}}
     for node in inventory["nodes"]:
+        if not node.get("enabled", True):
+            report["nodes"][node["name"]] = {"skipped": "disabled in inventory"}
+            continue
         res = {}
         for name, cmd in CHECKS.items():
             cmd = cmd.format(nvme=shlex.quote(node.get("nvme", {}).get("path", "/")))
@@ -42,8 +45,9 @@ def run(inventory: dict, contract_path: pathlib.Path | None = None) -> dict:
             "rdma_present": "NO_RDMA" not in res["rdma"]["out"],
         }
         report["nodes"][node["name"]] = res
-    report["go"] = all(n["verdict"]["gpu_count_ok"] and n["verdict"]["docker_ok"]
-                       for n in report["nodes"].values())
+    active = [n for n in report["nodes"].values() if "verdict" in n]
+    report["go"] = bool(active) and all(n["verdict"]["gpu_count_ok"] and n["verdict"]["docker_ok"]
+                                        for n in active)
     return report
 
 

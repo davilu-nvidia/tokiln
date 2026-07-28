@@ -1,0 +1,19 @@
+name: ci
+on:
+  push: {branches: [main]}
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {submodules: recursive}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.10"}
+      - run: pip install -e . pytest
+      - run: python -m compileall -q tokiln
+      - run: pytest -q tests
+      # 渲染产物必须能过 docker compose config (runner 自带 docker)
+      - run: |
+          python -m tokiln.cli render --profile m0-sglang-only
+          docker compose -f runs/*/node1.compose.yaml config -q

@@ -1,0 +1,22 @@
+{
+  "mode": "synth",
+  "arm": "A",
+  "concurrency": 8,
+  "elapsed_s": 133.8,
+  "sessions_done": 10,
+  "err_reasons": {},
+  "requests_ok": 94,
+  "requests_err": 0,
+  "total_steps": 94,
+  "steps_per_min": 42.1,
+  "total_out_tokens": 21313,
+  "throughput_tok_s": 159.3,
+  "ttft_p50_s": 1.479,
+  "ttft_p95_s": 4.276,
+  "tpot_p50_ms": 30.2,
+  "tpot_p95_ms": 57.1,
+  "e2e_p50_s": 124.4,
+  "e2e_p95_s": 133.4,
+  "out_speed_p25_tok_s": 24.8,
+  "out_speed_median_tok_s": 33.3
+}
