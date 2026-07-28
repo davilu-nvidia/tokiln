@@ -1,3 +1,6 @@
 [submodule "third_party/aa-loadgen"]
 	path = third_party/aa-loadgen
 	url = https://github.com/davilu-nvidia/aa-loadgen.git
+[submodule "third_party/agentic-serving-monitor"]
+	path = third_party/agentic-serving-monitor
+	url = https://github.com/davilu-nvidia/agentic-serving-monitor.git
