@@ -77,7 +77,8 @@ def cmd_bench(args):
 def cmd_monitor(args):
     if args.mode == "serve":
         from .monitor.server import serve
-        serve(args.sglang, RUNS, port=args.port, interval=args.interval or 5.0)
+        serve(args.sglang, RUNS, port=args.port, interval=args.interval or 5.0,
+              control_token=args.control_token)
     else:  # watch
         from .monitor import watch
         import sys
@@ -126,6 +127,8 @@ def main():
     p.add_argument("--monitor-url", default="http://localhost:8100", help="watch: monitor serve address")
     p.add_argument("--interval", type=float, default=0, help="collect/refresh interval (0 = default: serve 5s, watch 2s)")
     p.add_argument("--once", action="store_true", help="watch: render a single frame")
+    p.add_argument("--control-token", default="",
+                   help="serve: when set (or via TOKILN_MONITOR_TOKEN), bench start/stop requires this token; viewing stays open")
     p.set_defaults(func=cmd_monitor)
 
     p = sub.add_parser("report"); p.add_argument("run_dir", nargs="+",

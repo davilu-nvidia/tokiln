@@ -71,6 +71,31 @@ Dashboard during load:
 └──────────────────────────────────────────────────────────────
 ```
 
+## Sharing the monitoring with teammates
+
+Both GUIs bind to `0.0.0.0`, so anyone on the internal network just opens the URLs:
+
+- Dashboard + bench control: `http://<node>:8100/`
+- Grafana (anonymous viewer enabled): `http://<node>:3000/d/tokiln-sglang`
+
+If a teammate's machine cannot route to the node, an SSH tunnel is enough:
+
+```bash
+ssh -N -L 8100:localhost:8100 -L 3000:localhost:3000 root@<node>
+# then open http://localhost:8100/ and http://localhost:3000/ locally
+```
+
+Viewing is always open. To stop teammates from (accidentally) starting/stopping
+benches, run the monitor with a control token — the GUI prompts for it once and
+remembers it:
+
+```bash
+TOKILN_MONITOR_TOKEN=<secret> make monitor-serve     # or: tokiln monitor serve --control-token <secret>
+```
+
+Terminal-only teammates can copy the single file `tokiln/monitor/watch.py`
+(stdlib only, Windows/macOS/Linux) and run `python watch.py --url http://<node>:8100`.
+
 ## Common pitfalls (measured on h20-09)
 
 | Symptom | Cause → fix |

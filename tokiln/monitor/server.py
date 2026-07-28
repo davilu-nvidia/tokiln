@@ -237,17 +237,27 @@ async function btick(){
       :(b.workload?`last: ${b.workload} arm ${b.arm}${b.rc!=null?' — rc='+b.rc+(b.rc===0?' (pass)':b.rc===4?' (criteria failed)':''):''}`:'no bench launched yet');
   }catch(e){}
 }
+async function benchPost(path,body){
+  const hdrs={'Content-Type':'application/json'};
+  const tok=localStorage.getItem('tokiln_ctl_token');
+  if(tok)hdrs['X-Control-Token']=tok;
+  let r=await fetch(path,{method:'POST',headers:hdrs,body});
+  if(r.status===401){
+    const t=prompt('This monitor requires a control token to start/stop benches:');
+    if(t){localStorage.setItem('tokiln_ctl_token',t);
+      hdrs['X-Control-Token']=t;
+      r=await fetch(path,{method:'POST',headers:hdrs,body});}}
+  return r;}
 $('b_go').onclick=async()=>{
   $('b_go').disabled=true;
-  await fetch('bench/start',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({workload:$('b_wl').value,arm:$('b_arm').value})});
+  await benchPost('bench/start',JSON.stringify({workload:$('b_wl').value,arm:$('b_arm').value}));
   btick();};
-$('b_halt').onclick=async()=>{await fetch('bench/stop',{method:'POST'});btick();};
+$('b_halt').onclick=async()=>{await benchPost('bench/stop');btick();};
 setInterval(tick,3000);setInterval(btick,3000);tick();btick();
 </script></body></html>"""
 
 
-def build_app(col: Collector, bench: "BenchController") -> web.Application:
+def build_app(col: Collector, bench: "BenchController", control_token: str = "") -> web.Application:
     async def snapshot(_):
         return web.json_response(col.snapshot, headers={"Access-Control-Allow-Origin": "*"})
 
@@ -260,12 +270,19 @@ def build_app(col: Collector, bench: "BenchController") -> web.Application:
     async def bench_get(_):
         return web.json_response(bench.status())
 
+    def _authorized(req) -> bool:
+        return not control_token or req.headers.get("X-Control-Token", "") == control_token
+
     async def bench_start(req):
+        if not _authorized(req):
+            return web.json_response({"error": "control token required"}, status=401)
         body = await req.json()
         code, out = bench.start(body.get("workload", "smoke"), body.get("arm", "A"))
         return web.json_response(out, status=code)
 
-    async def bench_stop(_):
+    async def bench_stop(req):
+        if not _authorized(req):
+            return web.json_response({"error": "control token required"}, status=401)
         return web.json_response(bench.stop())
 
     app = web.Application()
@@ -281,10 +298,12 @@ async def _loop(col: Collector):
         await asyncio.sleep(col.interval)
 
 
-def serve(sglang_url: str, runs_dir: pathlib.Path, port: int = 8100, interval: float = 5.0):
+def serve(sglang_url: str, runs_dir: pathlib.Path, port: int = 8100, interval: float = 5.0,
+          control_token: str = ""):
+    control_token = control_token or os.environ.get("TOKILN_MONITOR_TOKEN", "")
     col = Collector(sglang_url, runs_dir, interval)
     bench = BenchController(runs_dir.parent, col.sglang_url)
-    app = build_app(col, bench)
+    app = build_app(col, bench, control_token)
 
     async def main():
         asyncio.create_task(_loop(col))
